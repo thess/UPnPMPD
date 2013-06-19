@@ -1,0 +1,4 @@
+2012-06-30: UPnPMPD 1.0.0
+	- UPnP framework from  GmediaRender 0.0.6
+	- Added MPD support thru libmpdclient 
+
