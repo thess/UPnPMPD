@@ -43,5 +43,12 @@ void output_update_status(void);
 void output_update_position(void);
 extern const char *output_get_volume(void);
 
+typedef enum {
+    STATUS_TEST = -1,
+    STATUS_OK = 0,
+    STATUS_FAIL = 1
+} CNX_STATUS;
+
+CNX_STATUS check_mpd_connection(bool update_status);
 
 #endif /*  _OUTPUT_MPD_H */

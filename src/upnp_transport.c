@@ -410,7 +410,7 @@ static struct argument **argument_list[] = {
 
 static ithread_mutex_t transport_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static enum _transport_state transport_state = TRANSPORT_STOPPED;
+static enum _transport_state transport_state = -1;
 
 static int get_media_info(struct action_event *event)
 {
@@ -546,7 +546,7 @@ DBG_STATIC char *transport_get_state_lastchange(void)
 {
     char *buf;
 
-        // Construct LastChange event accordingly
+    // Construct LastChange event accordingly
     if (strcmp(transport_values[TRANSPORT_VAR_CUR_TRACK_URI], "") == 0)
     {
         asprintf(&buf,
@@ -823,6 +823,10 @@ DBG_STATIC int xplaymode(struct action_event *event)
     newmode = upnp_get_string(event, "NewPlayMode");
     DBG_PRINT(DBG_LVL4, "Set NewPlayMode: %s\n", newmode);
 
+    // Check MPD connection
+    if (check_mpd_connection(TRUE) == STATUS_FAIL)
+        return -1;
+
 	ithread_mutex_lock(&transport_mutex);
 
     rc = output_playmode(newmode);
@@ -843,11 +847,17 @@ out:
 
 DBG_STATIC int xstop(struct action_event *event)
 {
+    int rc = 0;
+
 	if (upnp_obtain_instanceid(event, NULL))
 	{
 	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
+
+    // Check MPD connection
+    if (check_mpd_connection(TRUE) == STATUS_FAIL)
+        return -1;
 
 	ithread_mutex_lock(&transport_mutex);
 
@@ -858,9 +868,14 @@ DBG_STATIC int xstop(struct action_event *event)
 	case TRANSPORT_PLAYING:
 	case TRANSPORT_TRANSITIONING:
 	case TRANSPORT_PAUSED_PLAYBACK:
-		output_stop();
-		transport_state = TRANSPORT_STOPPED;
-		transport_change_var(event, TRANSPORT_VAR_TRANSPORT_STATE, "STOPPED");
+		if (output_stop())
+		{
+			upnp_set_error(event, UPNP_TRANSPORT_E_NO_CONTENTS, "Player Stop failed");
+			rc = -1;
+		} else {
+            transport_state = TRANSPORT_STOPPED;
+            transport_change_var(event, TRANSPORT_VAR_TRANSPORT_STATE, "STOPPED");
+        }
 		// Set TransportPlaySpeed to '1'
 		break;
 
@@ -873,7 +888,7 @@ DBG_STATIC int xstop(struct action_event *event)
 
 	ithread_mutex_unlock(&transport_mutex);
 
-	return 0;
+	return rc;
 }
 
 DBG_STATIC int xpause(struct action_event *event)
@@ -886,6 +901,10 @@ DBG_STATIC int xpause(struct action_event *event)
 		return -1;
 	}
 
+    // Check MPD connection
+    if (check_mpd_connection(TRUE) == STATUS_FAIL)
+        return -1;
+
 	ithread_mutex_lock(&transport_mutex);
 
 	switch (transport_state)
@@ -893,15 +912,20 @@ DBG_STATIC int xpause(struct action_event *event)
 	case TRANSPORT_STOPPED:
 		break;
 	case TRANSPORT_PLAYING:
-		output_pause();
-		transport_state = TRANSPORT_PAUSED_PLAYBACK;
-		transport_change_var(event, TRANSPORT_VAR_TRANSPORT_STATE, "PAUSED_PLAYBACK");
+		if (output_pause())
+		{
+			upnp_set_error(event, UPNP_TRANSPORT_E_NO_CONTENTS, "Player Pause failed");
+			rc = -1;
+		} else {
+            transport_state = TRANSPORT_PAUSED_PLAYBACK;
+            transport_change_var(event, TRANSPORT_VAR_TRANSPORT_STATE, "PAUSED_PLAYBACK");
+        }
 		break;
 
 	case TRANSPORT_PAUSED_PLAYBACK:
 		if (output_play())
 		{
-			upnp_set_error(event, UPNP_TRANSPORT_E_NO_CONTENTS, "MPD Play failed");
+			upnp_set_error(event, UPNP_TRANSPORT_E_NO_CONTENTS, "Player Start failed");
 			rc = -1;
 		} else {
 			transport_state = TRANSPORT_PLAYING;
@@ -931,6 +955,9 @@ DBG_STATIC int xplay(struct action_event *event)
 		return -1;
 	}
 
+    // Check MPD connection
+    if (check_mpd_connection(TRUE) == STATUS_FAIL)
+        return -1;
 
 	ithread_mutex_lock(&transport_mutex);
 
@@ -938,10 +965,11 @@ DBG_STATIC int xplay(struct action_event *event)
 	case TRANSPORT_PLAYING:
 		// Set TransportPlaySpeed to '1'
 		break;
+
 	case TRANSPORT_STOPPED:
 	case TRANSPORT_PAUSED_PLAYBACK:
 		if (output_play()) {
-			upnp_set_error(event, UPNP_TRANSPORT_E_NO_CONTENTS, "MPD Play failed");
+			upnp_set_error(event, UPNP_TRANSPORT_E_NO_CONTENTS, "Player Start failed");
 			rc = -1;
 		} else {
 			transport_state = TRANSPORT_PLAYING;
@@ -989,11 +1017,15 @@ DBG_STATIC int xseek(struct action_event *event)
 		return -1;
 	}
 
+    // Check MPD connection
+    if (check_mpd_connection(TRUE) == STATUS_FAIL)
+        return -1;
+
     // Attempt to seek player (doesn't work for streams)
     rc = output_seekto(mode, value);
     free(mode); free(value);
     if (rc != 0) {
-        upnp_set_error(event, UPNP_TRANSPORT_E_ILL_SEEKTARGET, "MPD Seek failed");
+        upnp_set_error(event, UPNP_TRANSPORT_E_ILL_SEEKTARGET, "Player Seek failed");
         return -1;
     }
 
@@ -1008,9 +1040,12 @@ DBG_STATIC int xnext(struct action_event *event)
 		return -1;
 	}
 
+    // Check MPD connection
+    if (check_mpd_connection(TRUE) == STATUS_FAIL)
+        return -1;
 
     if (output_next()) {
-        upnp_set_error(event, UPNP_TRANSPORT_E_TRANSITION_NA, "MPD Next failed");
+        upnp_set_error(event, UPNP_TRANSPORT_E_TRANSITION_NA, "Player Next failed");
         return -1;
     }
 
@@ -1025,8 +1060,12 @@ DBG_STATIC int xprevious(struct action_event *event)
 		return -1;
 	}
 
+    // Check MPD connection
+    if (check_mpd_connection(TRUE) == STATUS_FAIL)
+        return -1;
+
     if (output_prev()) {
-        upnp_set_error(event, UPNP_TRANSPORT_E_TRANSITION_NA, "MPD Previous failed");
+        upnp_set_error(event, UPNP_TRANSPORT_E_TRANSITION_NA, "Player Previous failed");
         return -1;
     }
 

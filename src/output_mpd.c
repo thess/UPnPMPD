@@ -44,12 +44,14 @@
 #include "output_mpd.h"
 
 // Net timeout in seconds
-#define MPD_TIMEOUT 5
+#define MPD_TIMEOUT_DEFAULT 5
 
 static int mpdvolume = 0;
 static int mutevolume = 0;
 static int track_duration;
 static char tempbuf[32];
+
+static int options_mpd_timeout = 0;
 static struct mpd_connection *mpd_conn = NULL;
 
 static gchar *options_host = NULL;
@@ -63,12 +65,6 @@ static gboolean test_mode = FALSE;
 static ithread_mutex_t mpd_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 DBG_STATIC void update_mpd_status(void);
-
-typedef enum {
-    STATUS_TEST = -1,
-    STATUS_OK = 0,
-    STATUS_FAIL = 1
-} CNX_STATUS;
 
 // MIME types list (really?)
 static const char *mpd_mime_types[] = {
@@ -104,13 +100,16 @@ static void output_printError(const char *tag)
 {
 	const char *message;
 
+    if (mpd_conn == NULL)
+        return;
+
 	message = mpd_connection_get_error_message(mpd_conn);
     // messages received from the server are UTF-8; the
     //   rest is either US-ASCII or locale */
 	//if (mpd_connection_get_error(mpd_conn) == MPD_ERROR_SERVER)
     //    message = charset_from_utf8(message);
 
-	fprintf(stderr, "error: (%s) returned %s\n", tag, message);
+	fprintf(stderr, "error: (%s) returned %s\n", tag, (message) ? message : "NULL");
 	// Close and free MPD connection
 	mpd_connection_free(mpd_conn);
 	mpd_conn = NULL;
@@ -120,7 +119,7 @@ static void output_printError(const char *tag)
 
 DBG_STATIC struct mpd_connection *setup_connection(void)
 {
-	mpd_conn = mpd_connection_new(options_host, options_port, MPD_TIMEOUT * 1000);
+	mpd_conn = mpd_connection_new(options_host, options_port, options_mpd_timeout * 1000);
 	if (mpd_conn == NULL) {
 		fputs("MPD connection - no memory!\n", stderr);
 		return NULL;
@@ -143,7 +142,7 @@ DBG_STATIC struct mpd_connection *setup_connection(void)
 }
 
 // Attempt (re-)connection
-DBG_STATIC CNX_STATUS check_mpd_connection(bool update_status)
+CNX_STATUS check_mpd_connection(bool update_status)
 {
     int rc = STATUS_FAIL;
 
@@ -155,10 +154,11 @@ DBG_STATIC CNX_STATUS check_mpd_connection(bool update_status)
 
     if (!mpd_conn)
     {
-        mpd_conn = setup_connection();
-        if (mpd_conn)
+        // Maybe reconnect
+        if (setup_connection() != NULL)
         {
-            // Maybe reconnect - update status
+            fprintf(stderr, "-> Reconnect OK\n");
+            // want status update?
             if (update_status)
                 update_mpd_status();
             // Success
@@ -212,12 +212,11 @@ void output_set_uri(const char *uri)
 		{
             /* we've got an error message from the server */
             const char *message = mpd_connection_get_error_message(mpd_conn);
-            ithread_mutex_unlock(&mpd_mutex);
             //message = charset_from_utf8(message);
             fprintf(stderr, "Error adding %s: %s\n", uri, message);
-            return;
-		}
-		output_printError(__FUNCTION__);
+ 		} else {
+            output_printError(__FUNCTION__);
+        }
     }
 
     ithread_mutex_unlock(&mpd_mutex);
@@ -227,9 +226,11 @@ void output_set_uri(const char *uri)
 
 int output_play(void)
 {
-    // Check MPD connection
-    if (check_mpd_connection(FALSE) != STATUS_OK)
-        return (test_mode) ? 0 : -1;
+    int rc = 0;
+
+    // Return success if test mode enabled
+    if (test_mode)
+        return 0;
 
     ithread_mutex_lock(&mpd_mutex);
 
@@ -239,27 +240,30 @@ int output_play(void)
 		{
             /* we've got an error message from the server */
             const char *message = mpd_connection_get_error_message(mpd_conn);
-            ithread_mutex_unlock(&mpd_mutex);
             //message = charset_from_utf8(message);
             fprintf(stderr, "error playing stream - %s\n", message);
-            return -1;
-		}
-		output_printError(__FUNCTION__);
-		return -1;
+		} else {
+            output_printError(__FUNCTION__);
+        }
+        // Return error
+		rc = -1;
+    } else {
+        // OK - update status
+        update_mpd_status();
     }
-
-    update_mpd_status();
 
     ithread_mutex_unlock(&mpd_mutex);
 
-	return 0;
+	return rc;
 }
 
 int output_stop(void)
 {
-    // Check MPD connection
-    if (check_mpd_connection(FALSE) != STATUS_OK)
-        return (test_mode) ? 0 : -1;
+    int rc = 0;
+
+    // Return success if test mode enabled
+    if (test_mode)
+        return 0;
 
     ithread_mutex_lock(&mpd_mutex);
 
@@ -269,27 +273,30 @@ int output_stop(void)
 		{
             /* we've got an error message from the server */
             const char *message = mpd_connection_get_error_message(mpd_conn);
-            ithread_mutex_unlock(&mpd_mutex);
             //message = charset_from_utf8(message);
             fprintf(stderr, "error stopping stream - %s\n", message);
-            return -1;
-		}
-		output_printError(__FUNCTION__);
-		return -1;
+		} else {
+            output_printError(__FUNCTION__);
+        }
+        // Return error
+		rc = -1;
+    } else {
+        // OK - update status
+        update_mpd_status();
     }
-
-    update_mpd_status();
 
     ithread_mutex_unlock(&mpd_mutex);
 
-	return 0;
+	return rc;
 }
 
 int output_pause(void)
 {
-    // Check MPD connection
-    if (check_mpd_connection(FALSE) != STATUS_OK)
-        return (test_mode) ? 0 : -1;
+    int rc = 0;
+
+    // Return success if test mode enabled
+    if (test_mode)
+        return 0;
 
     ithread_mutex_lock(&mpd_mutex);
 
@@ -299,27 +306,30 @@ int output_pause(void)
 		{
             /* we've got an error message from the server */
             const char *message = mpd_connection_get_error_message(mpd_conn);
-            ithread_mutex_unlock(&mpd_mutex);
             //message = charset_from_utf8(message);
             fprintf(stderr, "error pausing stream - %s\n", message);
-            return -1;
-		}
-		output_printError(__FUNCTION__);
-		return -1;
+		} else {
+            output_printError(__FUNCTION__);
+        }
+        // Return error
+		rc = -1;
+    } else {
+        // OK - update status
+        update_mpd_status();
     }
-
-    update_mpd_status();
 
     ithread_mutex_unlock(&mpd_mutex);
 
-	return 0;
+	return rc;
 }
 
 int output_next(void)
 {
-    // Check MPD connection
-    if (check_mpd_connection(FALSE) != STATUS_OK)
-        return (test_mode) ? 0 : -1;
+    int rc = 0;
+
+    // Return success if test mode enabled
+    if (test_mode)
+        return 0;
 
     ithread_mutex_lock(&mpd_mutex);
 
@@ -329,27 +339,30 @@ int output_next(void)
 		{
             /* we've got an error message from the server */
             const char *message = mpd_connection_get_error_message(mpd_conn);
-            ithread_mutex_unlock(&mpd_mutex);
             //message = charset_from_utf8(message);
             fprintf(stderr, "error setting next stream - %s\n", message);
-            return -1;
-		}
-		output_printError(__FUNCTION__);
-		return -1;
+		} else {
+            output_printError(__FUNCTION__);
+        }
+        // Return error
+		rc = -1;
+    } else {
+        // OK - update status
+        update_mpd_status();
     }
-
-    update_mpd_status();
 
     ithread_mutex_unlock(&mpd_mutex);
 
-   return 0;
+	return rc;
 }
 
 int output_prev(void)
 {
-    // Check MPD connection
-    if (check_mpd_connection(FALSE) != STATUS_OK)
-        return (test_mode) ? 0 : -1;
+    int rc = 0;
+
+    // Return success if test mode enabled
+    if (test_mode)
+        return 0;
 
     ithread_mutex_lock(&mpd_mutex);
 
@@ -359,46 +372,49 @@ int output_prev(void)
 		{
             /* we've got an error message from the server */
             const char *message = mpd_connection_get_error_message(mpd_conn);
-            ithread_mutex_unlock(&mpd_mutex);
             //message = charset_from_utf8(message);
             fprintf(stderr, "error setting previous stream - %s\n", message);
-            return -1;
-		}
-		output_printError(__FUNCTION__);
-		return -1;
+		} else {
+            output_printError(__FUNCTION__);
+        }
+        // Return error
+		rc = -1;
+    } else {
+        // OK - update status
+        update_mpd_status();
     }
-
-    update_mpd_status();
 
     ithread_mutex_unlock(&mpd_mutex);
 
-    return 0;
+	return rc;
 }
 
 int output_seekto(const char *seekmode, const char *seekpos)
 {
     struct mpd_status *mstatus;
     int sid, seekto;
+    int rc = 0;
 
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) != STATUS_OK)
-        return (test_mode) ? 0 : -1;
+    // Return success if test mode enabled
+    if (test_mode)
+        return 0;
 
     ithread_mutex_lock(&mpd_mutex);
 
     mstatus = mpd_run_status(mpd_conn);
     if (mstatus == NULL)
     {
-        ithread_mutex_unlock(&mpd_mutex);
 		if (mpd_connection_get_error(mpd_conn) == MPD_ERROR_SERVER)
 		{
             /* we've got an error message from the server */
             const char *message = mpd_connection_get_error_message(mpd_conn);
             //message = charset_from_utf8(message);
             fprintf(stderr, "error getting status - %s\n", message);
-            return -1;
-		}
-		output_printError(__FUNCTION__);
+		} else {
+            output_printError(__FUNCTION__);
+        }
+
+        ithread_mutex_unlock(&mpd_mutex);
 		return -1;
     }
 
@@ -430,30 +446,34 @@ int output_seekto(const char *seekmode, const char *seekpos)
 
     if (!mpd_run_seek_id(mpd_conn, sid, seekto))
     {
-        ithread_mutex_unlock(&mpd_mutex);
 		if (mpd_connection_get_error(mpd_conn) == MPD_ERROR_SERVER)
 		{
             /* we've got an error message from the server */
             const char *message = mpd_connection_get_error_message(mpd_conn);
             //message = charset_from_utf8(message);
             fprintf(stderr, "error seeking stream - %s\n", message);
-            return -1;
-		}
-		output_printError(__FUNCTION__);
-		return -1;
+		} else {
+            output_printError(__FUNCTION__);
+        }
+        // Return error
+		rc = -1;
+    } else {
+        // OK - update status
+        update_mpd_status();
     }
 
     ithread_mutex_unlock(&mpd_mutex);
 
-    return 0;
+	return rc;
 }
 
 int output_playmode(const char *newmode)
 {
     int rc = 0;
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) != STATUS_OK)
-        return (test_mode) ? 0 : -1;
+
+    // Return success if test mode enabled
+    if (test_mode)
+        return 0;
 
     ithread_mutex_lock(&mpd_mutex);
 
@@ -543,8 +563,8 @@ void output_set_volume(const char *newvol)
 {
     int val;
 
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) != STATUS_OK)
+    // Return success if test mode enabled
+    if (test_mode)
         return;
 
     // Validate input request (0-100)
@@ -565,17 +585,16 @@ void output_set_volume(const char *newvol)
 		{
             /* we've got an error message from the server */
             const char *message = mpd_connection_get_error_message(mpd_conn);
-            ithread_mutex_unlock(&mpd_mutex);
             //message = charset_from_utf8(message);
             fprintf(stderr, "error setting volume - %s\n", message);
-            return;
-		}
-		output_printError(__FUNCTION__);
+ 		} else {
+            output_printError(__FUNCTION__);
+        }
+    } else {
+        // Keep local copy of volume
+        mpdvolume = val;
+        mutevolume = val;
     }
-
-    // Keep local copy of volume
-    mpdvolume = val;
-    mutevolume = val;
 
     ithread_mutex_unlock(&mpd_mutex);
 
@@ -586,8 +605,8 @@ void output_set_mute(bool bmute)
 {
     int newvolume;
 
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) != STATUS_OK)
+    // Return success if test mode enabled
+    if (test_mode)
         return;
 
     if (bmute)
@@ -608,15 +627,14 @@ void output_set_mute(bool bmute)
 		{
             /* we've got an error message from the server */
             const char *message = mpd_connection_get_error_message(mpd_conn);
-            ithread_mutex_unlock(&mpd_mutex);
             //message = charset_from_utf8(message);
             fprintf(stderr, "error setting volume - %s\n", message);
-            return;
-		}
-		output_printError(__FUNCTION__);
+		} else {
+            output_printError(__FUNCTION__);
+        }
+    } else {
+        mpdvolume = newvolume;
     }
-
-    mpdvolume = newvolume;
 
     ithread_mutex_unlock(&mpd_mutex);
 
@@ -635,10 +653,10 @@ const char *output_get_volume(void)
  *************************************************************/
 
 #define DIDL_LITE_TEMPLATE  \
-    "<DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"" \
-        "xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\"" \
-        "xmlns:dc=\"http://purl.org/dc/elements/1.1/\"" \
-        "xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\">" \
+    "<DIDL-Lite xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" " \
+        "xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" " \
+        "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " \
+       "xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\">" \
             "<item id=\"xyzzy$1$0\" parentID=\"xyzzy$1\" restricted=\"1\">" \
                 "<upnp:class>object.item.audioItem.musicTrack</upnp:class>" \
                 "<dc:title>%s</dc:title>" \
@@ -762,6 +780,38 @@ DBG_STATIC void update_track_position(struct mpd_status *mstatus)
     return;
 }
 
+//
+// Translate MPD player to UPnP STATE value
+//
+DBG_STATIC void output_translate_state(struct mpd_status *mstatus)
+{
+
+    switch(mpd_status_get_state(mstatus))
+    {
+    case MPD_STATE_UNKNOWN:
+        // no information available
+        fprintf(stderr, "MPD state unknown\n");
+        break;
+
+    case MPD_STATE_STOP:
+        // not playing
+        transport_set_state(TRANSPORT_STOPPED, "STOPPED");
+        break;
+
+    case MPD_STATE_PLAY:
+        // playing
+        transport_set_state(TRANSPORT_PLAYING, "PLAYING");
+        break;
+
+    case MPD_STATE_PAUSE:
+        // playing, but paused
+        transport_set_state(TRANSPORT_PAUSED_PLAYBACK, "PAUSED_PLAYBACK");
+        break;
+    }
+
+    return;
+}
+
 // Note: caller must hold mpd_mutext
 DBG_STATIC void update_mpd_status(void)
 {
@@ -846,29 +896,10 @@ DBG_STATIC void update_mpd_status(void)
     // Current volume setting
     mpdvolume = mpd_status_get_volume(mstatus);
 
-    switch(mpd_status_get_state(mstatus))
-    {
-    case MPD_STATE_UNKNOWN:
-        // no information available
-        fprintf(stderr, "MPD state unknown\n");
-        break;
+    // MPD state update
+    output_translate_state(mstatus);
 
-    case MPD_STATE_STOP:
-        // not playing
-        transport_set_state(TRANSPORT_STOPPED, "STOPPED");
-        break;
-
-    case MPD_STATE_PLAY:
-        // playing
-        transport_set_state(TRANSPORT_PLAYING, "PLAYING");
-        break;
-
-    case MPD_STATE_PAUSE:
-        // playing, but paused
-        transport_set_state(TRANSPORT_PAUSED_PLAYBACK, "PAUSED_PLAYBACK");
-        break;
-    }
-
+    // and track position
     update_track_position(mstatus);
 
     mpd_status_free(mstatus);
@@ -907,15 +938,17 @@ void output_update_position(void)
             const char *message = mpd_connection_get_error_message(mpd_conn);
             //message = charset_from_utf8(message);
             fprintf(stderr, "error getting status - %s\n", message);
-            return;
-		}
-		output_printError(__FUNCTION__);
-		return;
+		} else {
+            output_printError(__FUNCTION__);
+        }
+    } else {
+        // Update player state
+        output_translate_state(mstatus);
+
+        update_track_position(mstatus);
+
+        mpd_status_free(mstatus);
     }
-
-    update_track_position(mstatus);
-
-    mpd_status_free(mstatus);
 
 	ithread_mutex_unlock(&mpd_mutex);
 
@@ -947,6 +980,8 @@ static GOptionEntry option_entries[] = {
           "MPD host port number ", NULL },
         { "password", 'P', 0, G_OPTION_ARG_STRING, &options_password,
           "MPD host password ", NULL },
+        { "timeout", 'T', 0, G_OPTION_ARG_INT, &options_mpd_timeout,
+          "MPD transaction timeout (secs) ", NULL },
         { "testmode", 't', 0, G_OPTION_ARG_NONE, &test_mode,
            "testmode - OK if no MPD", NULL },
         { NULL }
@@ -997,12 +1032,24 @@ int output_mpd_init(config_t *cfg)
         }
     }
 
+    if (options_mpd_timeout == 0)
+    {
+        if (config_lookup_int(cfg, "timeout", (long *)&options_mpd_timeout) != CONFIG_TRUE)
+        {
+            options_mpd_timeout = MPD_TIMEOUT_DEFAULT;
+        }
+    }
+
     if (options_password == NULL)
         config_lookup_string(cfg, "password", (const char **)&options_password);
 
 
-    if (check_mpd_connection(FALSE) != STATUS_OK)
-        return (test_mode) ? 0 : 1;
+    if (!test_mode)
+    {
+        // Connect to MPD
+        if (setup_connection() == NULL)
+            return 1;
+    }
 
     return 0;
 }
