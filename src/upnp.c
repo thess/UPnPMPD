@@ -43,24 +43,25 @@
 
 #include "upnp.h"
 
-static const char *param_datatype_names[] = {
-        [DATATYPE_STRING] =     "string",
-        [DATATYPE_BOOLEAN] =    "boolean",
-        [DATATYPE_I2] =         "i2",
-        [DATATYPE_I4] =         "i4",
-        [DATATYPE_UI2] =        "ui2",
-        [DATATYPE_UI4] =        "ui4",
-        [DATATYPE_UNKNOWN] =    NULL
+static const char *param_datatype_names[] =
+{
+	[DATATYPE_STRING] =     "string",
+	[DATATYPE_BOOLEAN] =    "boolean",
+	[DATATYPE_I2] =         "i2",
+	[DATATYPE_I4] =         "i4",
+	[DATATYPE_UI2] =        "ui2",
+	[DATATYPE_UI4] =        "ui4",
+	[DATATYPE_UNKNOWN] =    NULL
 };
 
 DBG_STATIC void add_value_attribute(IXML_Document *doc, IXML_Element *parent,
-                                    char *attrname, char *value)
+				    char *attrname, char *value)
 {
 	ixmlElement_setAttribute(parent, attrname, value);
 }
 
 DBG_STATIC void add_value_element(IXML_Document *doc, IXML_Element *parent,
-                                  char *tagname, char *value)
+				  char *tagname, char *value)
 {
 	IXML_Element *top;
 	IXML_Node *child;
@@ -74,7 +75,7 @@ DBG_STATIC void add_value_element(IXML_Document *doc, IXML_Element *parent,
 }
 
 DBG_STATIC void add_value_element_int(IXML_Document *doc, IXML_Element *parent,
-                                      char *tagname, int value)
+				      char *tagname, int value)
 {
 	char *buf;
 
@@ -84,7 +85,7 @@ DBG_STATIC void add_value_element_int(IXML_Document *doc, IXML_Element *parent,
 }
 
 DBG_STATIC void add_value_element_long(IXML_Document *doc, IXML_Element *parent,
-                                       char *tagname, long long value)
+				       char *tagname, long long value)
 {
 	char *buf;
 
@@ -106,8 +107,8 @@ DBG_STATIC IXML_Element *gen_specversion(IXML_Document *doc, int major, int mino
 }
 
 DBG_STATIC IXML_Element *gen_scpd_action(IXML_Document *doc, struct action *act,
-                                         struct argument **arglist,
-                                         const char **varnames)
+		struct argument **arglist,
+		const char **varnames)
 {
 	IXML_Element *top;
 	IXML_Element *parent,*child;
@@ -136,7 +137,7 @@ DBG_STATIC IXML_Element *gen_scpd_action(IXML_Document *doc, struct action *act,
 }
 
 DBG_STATIC IXML_Element *gen_scpd_actionlist(IXML_Document *doc,
-                                             struct service *srv)
+		struct service *srv)
 {
 	IXML_Element *top;
 	IXML_Element *child;
@@ -164,7 +165,7 @@ DBG_STATIC IXML_Element *gen_scpd_actionlist(IXML_Document *doc,
 }
 
 DBG_STATIC IXML_Element *gen_scpd_statevar(IXML_Document *doc, const char *name,
-                                           struct var_meta *meta)
+		struct var_meta *meta)
 {
 	IXML_Element *top,*parent;
 	const char **valuelist;
@@ -284,7 +285,7 @@ DBG_STATIC IXML_Element *gen_desc_iconlist(IXML_Document *doc, struct icon **ico
 }
 
 DBG_STATIC IXML_Element *gen_desc_servicelist(struct device *device_def,
-                                              IXML_Document *doc)
+		IXML_Document *doc)
 {
 	int i;
 	struct service *srv;
@@ -293,16 +294,16 @@ DBG_STATIC IXML_Element *gen_desc_servicelist(struct device *device_def,
 
 	top = ixmlDocument_createElement(doc, "serviceList");
 
-    for (i = 0; (srv = device_def->services[i]); i++)
-    {
-        parent = ixmlDocument_createElement(doc, "service");
-        ixmlNode_appendChild((IXML_Node *)top, (IXML_Node *)parent);
-        add_value_element(doc, parent, "serviceType", srv->type);
-        add_value_element(doc, parent, "serviceId", (char *)srv->service_name);
-        add_value_element(doc, parent, "SCPDURL", (char *)srv->scpd_url);
-        add_value_element(doc, parent, "controlURL", (char *)srv->control_url);
-        add_value_element(doc, parent, "eventSubURL", (char *)srv->event_url);
-    }
+	for (i = 0; (srv = device_def->services[i]); i++)
+	{
+		parent = ixmlDocument_createElement(doc, "service");
+		ixmlNode_appendChild((IXML_Node *)top, (IXML_Node *)parent);
+		add_value_element(doc, parent, "serviceType", srv->type);
+		add_value_element(doc, parent, "serviceId", (char *)srv->service_name);
+		add_value_element(doc, parent, "SCPDURL", (char *)srv->scpd_url);
+		add_value_element(doc, parent, "controlURL", (char *)srv->control_url);
+		add_value_element(doc, parent, "eventSubURL", (char *)srv->event_url);
+	}
 
 	return top;
 }
@@ -370,9 +371,9 @@ struct action *find_action(struct service *event_service, char *action_name)
 		return NULL;
 
 	while (event_action =
-	       &(event_service->actions[actionNum]),
-	       event_action->action_name != NULL)
-    {
+				&(event_service->actions[actionNum]),
+			event_action->action_name != NULL)
+	{
 		if (strcmp(event_action->action_name, action_name) == 0)
 			return event_action;
 		actionNum++;
@@ -389,7 +390,7 @@ char *upnp_get_scpd(struct service *srv)
 	doc = generate_scpd(srv);
 	if (doc != NULL)
 	{
-  		result = ixmlDocumenttoString(doc);
+		result = ixmlDocumenttoString(doc);
 		ixmlDocument_free(doc);
 	}
 	return result;
@@ -404,7 +405,7 @@ char *upnp_get_device_desc(struct device *device_def)
 
 	if (doc != NULL)
 	{
-        result = ixmlDocumenttoString(doc);
+		result = ixmlDocumenttoString(doc);
 		ixmlDocument_free(doc);
 	}
 

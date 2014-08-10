@@ -32,8 +32,8 @@ void upnp_renderer_dump_control_scpd(void);
 void upnp_renderer_dump_transport_scpd(void);
 
 struct device *upnp_renderer_new(const char *friendly_name,
-                                 const char *mac_addr,
-                                 const char *sn,
-                                 config_t *cfg);
+				 const char *mac_addr,
+				 const char *sn,
+				 config_t *cfg);
 
 #endif /* _UPNP_RENDERER_H */

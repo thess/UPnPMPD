@@ -27,8 +27,8 @@
 
 extern struct UpnpVirtualDirCallbacks virtual_dir_callbacks;
 extern int webserver_register_buf(const char *path, const char *contents,
-                                  const char *content_type);
+				  const char *content_type);
 extern int webserver_register_file(const char *path,
-                                   const char *content_type);
+				   const char *content_type);
 
 #endif /* _WEBSERVER_H */

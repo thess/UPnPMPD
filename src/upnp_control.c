@@ -54,7 +54,8 @@
 
 static struct action control_actions[];
 
-static const char *control_variables[] = {
+static const char *control_variables[] =
+{
 	[CONTROL_VAR_LAST_CHANGE] = "LastChange",
 	[CONTROL_VAR_PRESET_NAME_LIST] = "PresetNameList",
 	[CONTROL_VAR_AAT_CHANNEL] = "A_ARG_TYPE_Channel",
@@ -120,7 +121,8 @@ static struct param_range keystone_range = { -32768, 32767, 1 };
 static struct param_range volume_range = { 0, 100, 1 };
 static struct param_range volume_db_range = { -32768, 32767, 0 };
 
-static struct var_meta control_var_meta[] = {
+static struct var_meta control_var_meta[] =
+{
 	[CONTROL_VAR_LAST_CHANGE] =		    { SENDEVENT_YES, DATATYPE_STRING, NULL, NULL },
 	[CONTROL_VAR_PRESET_NAME_LIST] =	{ SENDEVENT_NO, DATATYPE_STRING, NULL, NULL },
 	[CONTROL_VAR_AAT_CHANNEL] =		    { SENDEVENT_NO, DATATYPE_STRING, aat_channels, NULL },
@@ -147,7 +149,8 @@ static struct var_meta control_var_meta[] = {
 	[CONTROL_VAR_UNKNOWN] =			{ SENDEVENT_NO, DATATYPE_UNKNOWN, NULL, NULL }
 };
 
-static const char *control_defaults[] = {
+static const char *control_defaults[] =
+{
 	[CONTROL_VAR_LAST_CHANGE] = "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/RCS/\"><InstanceID val=\"0\"></InstanceID></Event>",
 	[CONTROL_VAR_PRESET_NAME_LIST] = "",
 	[CONTROL_VAR_AAT_CHANNEL] = "Master",
@@ -179,190 +182,225 @@ static char *control_values[sizeof(control_defaults) / sizeof(char *)];
 // Control service mutex
 static ithread_mutex_t control_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static struct argument *arguments_list_presets[] = {
+static struct argument *arguments_list_presets[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentPresetNameList", PARAM_DIR_OUT, CONTROL_VAR_PRESET_NAME_LIST },
 	NULL
 };
-static struct argument *arguments_select_preset[] = {
+static struct argument *arguments_select_preset[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "PresetName", PARAM_DIR_IN, CONTROL_VAR_AAT_PRESET_NAME },
 	NULL
 };
 
 #if defined(UPNP_VIDEO)
-static struct argument *arguments_get_brightness[] = {
+static struct argument *arguments_get_brightness[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentBrightness", PARAM_DIR_OUT, CONTROL_VAR_BRIGHTNESS },
 	NULL
 };
-static struct argument *arguments_set_brightness[] = {
+static struct argument *arguments_set_brightness[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredBrightness", PARAM_DIR_IN, CONTROL_VAR_BRIGHTNESS },
 	NULL
 };
-static struct argument *arguments_get_contrast[] = {
+static struct argument *arguments_get_contrast[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentContrast", PARAM_DIR_OUT, CONTROL_VAR_CONTRAST },
 	NULL
 };
-static struct argument *arguments_set_contrast[] = {
+static struct argument *arguments_set_contrast[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredContrast", PARAM_DIR_IN, CONTROL_VAR_CONTRAST },
 	NULL
 };
-static struct argument *arguments_get_sharpness[] = {
+static struct argument *arguments_get_sharpness[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentSharpness", PARAM_DIR_OUT, CONTROL_VAR_SHARPNESS },
 	NULL
 };
-static struct argument *arguments_set_sharpness[] = {
+static struct argument *arguments_set_sharpness[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredSharpness", PARAM_DIR_IN, CONTROL_VAR_SHARPNESS },
 	NULL
 };
-static struct argument *arguments_get_red_gain[] = {
+static struct argument *arguments_get_red_gain[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentRedVideoGain", PARAM_DIR_OUT, CONTROL_VAR_R_GAIN },
 	NULL
 };
-static struct argument *arguments_set_red_gain[] = {
+static struct argument *arguments_set_red_gain[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredRedVideoGain", PARAM_DIR_IN, CONTROL_VAR_R_GAIN },
 	NULL
 };
-static struct argument *arguments_get_green_gain[] = {
+static struct argument *arguments_get_green_gain[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentGreenVideoGain", PARAM_DIR_OUT, CONTROL_VAR_G_GAIN },
 	NULL
 };
-static struct argument *arguments_set_green_gain[] = {
+static struct argument *arguments_set_green_gain[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredGreenVideoGain", PARAM_DIR_IN, CONTROL_VAR_G_GAIN },
 	NULL
 };
-static struct argument *arguments_get_blue_gain[] = {
+static struct argument *arguments_get_blue_gain[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentBlueVideoGain", PARAM_DIR_OUT, CONTROL_VAR_B_GAIN },
 	NULL
 };
-static struct argument *arguments_set_blue_gain[] = {
+static struct argument *arguments_set_blue_gain[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredBlueVideoGain", PARAM_DIR_IN, CONTROL_VAR_B_GAIN },
 	NULL
 };
-static struct argument *arguments_get_red_black[] = {
+static struct argument *arguments_get_red_black[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentRedVideoBlackLevel", PARAM_DIR_OUT, CONTROL_VAR_R_BLACK },
 	NULL
 };
-static struct argument *arguments_set_red_black[] = {
+static struct argument *arguments_set_red_black[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredRedVideoBlackLevel", PARAM_DIR_IN, CONTROL_VAR_R_BLACK },
 	NULL
 };
-static struct argument *arguments_get_green_black[] = {
+static struct argument *arguments_get_green_black[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentGreenVideoBlackLevel", PARAM_DIR_OUT, CONTROL_VAR_G_BLACK },
 	NULL
 };
-static struct argument *arguments_set_green_black[] = {
+static struct argument *arguments_set_green_black[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredGreenVideoBlackLevel", PARAM_DIR_IN, CONTROL_VAR_G_BLACK },
 	NULL
 };
-static struct argument *arguments_get_blue_black[] = {
+static struct argument *arguments_get_blue_black[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentBlueVideoBlackLevel", PARAM_DIR_OUT, CONTROL_VAR_B_BLACK },
 	NULL
 };
-static struct argument *arguments_set_blue_black[] = {
+static struct argument *arguments_set_blue_black[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredBlueVideoBlackLevel", PARAM_DIR_IN, CONTROL_VAR_B_BLACK },
 	NULL
 };
-static struct argument *arguments_get_color_temp[] = {
+static struct argument *arguments_get_color_temp[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentColorTemperature", PARAM_DIR_OUT, CONTROL_VAR_COLOR_TEMP },
 	NULL
 };
-static struct argument *arguments_set_color_temp[] = {
+static struct argument *arguments_set_color_temp[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredColorTemperature", PARAM_DIR_IN, CONTROL_VAR_COLOR_TEMP },
 	NULL
 };
-static struct argument *arguments_get_hor_keystone[] = {
+static struct argument *arguments_get_hor_keystone[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentHorizontalKeystone", PARAM_DIR_OUT, CONTROL_VAR_HOR_KEYSTONE },
 	NULL
 };
-static struct argument *arguments_set_hor_keystone[] = {
+static struct argument *arguments_set_hor_keystone[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredHorizontalKeystone", PARAM_DIR_IN, CONTROL_VAR_HOR_KEYSTONE },
 	NULL
 };
-static struct argument *arguments_get_vert_keystone[] = {
+static struct argument *arguments_get_vert_keystone[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "CurrentVerticalKeystone", PARAM_DIR_OUT, CONTROL_VAR_VER_KEYSTONE },
 	NULL
 };
-static struct argument *arguments_set_vert_keystone[] = {
+static struct argument *arguments_set_vert_keystone[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "DesiredVerticalKeystone", PARAM_DIR_IN, CONTROL_VAR_VER_KEYSTONE },
 	NULL
 };
 #endif
 
-static struct argument *arguments_get_mute[] = {
+static struct argument *arguments_get_mute[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "Channel", PARAM_DIR_IN, CONTROL_VAR_AAT_CHANNEL },
 	& (struct argument) { "CurrentMute", PARAM_DIR_OUT, CONTROL_VAR_MUTE },
 	NULL
 };
-static struct argument *arguments_set_mute[] = {
+static struct argument *arguments_set_mute[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "Channel", PARAM_DIR_IN, CONTROL_VAR_AAT_CHANNEL },
 	& (struct argument) { "DesiredMute", PARAM_DIR_IN, CONTROL_VAR_MUTE },
 	NULL
 };
-static struct argument *arguments_get_vol[] = {
+static struct argument *arguments_get_vol[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "Channel", PARAM_DIR_IN, CONTROL_VAR_AAT_CHANNEL },
 	& (struct argument) { "CurrentVolume", PARAM_DIR_OUT, CONTROL_VAR_VOLUME },
 	NULL
 };
-static struct argument *arguments_set_vol[] = {
+static struct argument *arguments_set_vol[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "Channel", PARAM_DIR_IN, CONTROL_VAR_AAT_CHANNEL },
 	& (struct argument) { "DesiredVolume", PARAM_DIR_IN, CONTROL_VAR_VOLUME },
 	NULL
 };
-static struct argument *arguments_get_vol_db[] = {
+static struct argument *arguments_get_vol_db[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "Channel", PARAM_DIR_IN, CONTROL_VAR_AAT_CHANNEL },
 	& (struct argument) { "CurrentVolume", PARAM_DIR_OUT, CONTROL_VAR_VOLUME_DB },
 	NULL
 };
-static struct argument *arguments_set_vol_db[] = {
+static struct argument *arguments_set_vol_db[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "Channel", PARAM_DIR_IN, CONTROL_VAR_AAT_CHANNEL },
 	& (struct argument) { "DesiredVolume", PARAM_DIR_IN, CONTROL_VAR_VOLUME_DB },
 	NULL
 };
-static struct argument *arguments_get_vol_dbrange[] = {
+static struct argument *arguments_get_vol_dbrange[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "Channel", PARAM_DIR_IN, CONTROL_VAR_AAT_CHANNEL },
 	& (struct argument) { "MinValue", PARAM_DIR_OUT, CONTROL_VAR_VOLUME_DB },
 	& (struct argument) { "MaxValue", PARAM_DIR_OUT, CONTROL_VAR_VOLUME_DB },
 	NULL
 };
-static struct argument *arguments_get_loudness[] = {
+static struct argument *arguments_get_loudness[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "Channel", PARAM_DIR_IN, CONTROL_VAR_AAT_CHANNEL },
 	& (struct argument) { "CurrentLoudness", PARAM_DIR_OUT, CONTROL_VAR_LOUDNESS },
 	NULL
 };
-static struct argument *arguments_set_loudness[] = {
+static struct argument *arguments_set_loudness[] =
+{
 	& (struct argument) { "InstanceID", PARAM_DIR_IN, CONTROL_VAR_AAT_INSTANCE_ID },
 	& (struct argument) { "Channel", PARAM_DIR_IN, CONTROL_VAR_AAT_CHANNEL },
 	& (struct argument) { "DesiredLoudness", PARAM_DIR_IN, CONTROL_VAR_LOUDNESS },
@@ -370,7 +408,8 @@ static struct argument *arguments_set_loudness[] = {
 };
 
 
-static struct argument **argument_list[] = {
+static struct argument **argument_list[] =
+{
 	[CONTROL_CMD_LIST_PRESETS] =        	arguments_list_presets,
 	[CONTROL_CMD_SELECT_PRESET] =       	arguments_select_preset,
 #if defined(UPNP_VIDEO)
@@ -413,28 +452,30 @@ static struct argument **argument_list[] = {
 
 DBG_STATIC void control_notify_lastchange(struct action_event *event, char *value)
 {
-	const char *varnames[] = {
+	const char *varnames[] =
+	{
 		"LastChange",
 		NULL
 	};
-	char *varvalues[] = {
+	char *varvalues[] =
+	{
 		NULL, NULL
 	};
 
 	DBG_PRINT(DBG_LVL5, "RCS Event: '%s'\n", value);
 	varvalues[0] = xmlescape(value, 0);
 
-    if (control_values[CONTROL_VAR_LAST_CHANGE])
-        free(control_values[CONTROL_VAR_LAST_CHANGE]);
+	if (control_values[CONTROL_VAR_LAST_CHANGE])
+		free(control_values[CONTROL_VAR_LAST_CHANGE]);
 
 	control_values[CONTROL_VAR_LAST_CHANGE] = value;
 	UpnpNotify(device_handle, event->request->DevUDN,
-                event->request->ServiceID,
-                varnames, (const char **)varvalues, 1);
+		   event->request->ServiceID,
+		   varnames, (const char **)varvalues, 1);
 
-    free(varvalues[0]);
+	free(varvalues[0]);
 
-    return;
+	return;
 }
 
 void control_set_var(int varnum, char *value)
@@ -446,33 +487,33 @@ void control_set_var(int varnum, char *value)
 
 	if (control_values[varnum])
 	{
-	    // Any change
-	    if (strcmp(control_values[varnum], value) == 0)
-            return;
+		// Any change
+		if (strcmp(control_values[varnum], value) == 0)
+			return;
 
-        // Free old value before saving new one
-        free(control_values[varnum]);
+		// Free old value before saving new one
+		free(control_values[varnum]);
 	}
 
 	control_values[varnum] = strdup(value);
 
-    return;
+	return;
 }
 
 char *control_get_var(int varnum)
 {
 	assert((varnum >= 0) && (varnum < CONTROL_VAR_UNKNOWN));
 
-    return control_values[varnum];
+	return control_values[varnum];
 }
 
 /* warning - does not lock service mutex */
 DBG_STATIC void control_change_var(struct action_event *event,
-                                   int varnum, char *new_value)
+				   int varnum, char *new_value)
 {
 	char *buf;
 
-    control_set_var(varnum, new_value);
+	control_set_var(varnum, new_value);
 
 	asprintf(&buf,
 		 "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/RCS/\">"
@@ -486,49 +527,51 @@ DBG_STATIC void control_change_var(struct action_event *event,
 
 DBG_STATIC void control_update_settings(void)
 {
-    const char *curvol;
+	const char *curvol;
 
-    // Get current volume state
-    curvol = output_get_volume();
-    // current volume setting
-    control_set_var(CONTROL_VAR_VOLUME, (char *)curvol);
-    // Update mute setting also
-    if (*curvol == '0')
-    {
-        control_set_var(CONTROL_VAR_MUTE, "1");
-    } else {
-        control_set_var(CONTROL_VAR_MUTE, "0");
-    }
+	// Get current volume state
+	curvol = output_get_volume();
+	// current volume setting
+	control_set_var(CONTROL_VAR_VOLUME, (char *)curvol);
+	// Update mute setting also
+	if (*curvol == '0')
+	{
+		control_set_var(CONTROL_VAR_MUTE, "1");
+	}
+	else
+	{
+		control_set_var(CONTROL_VAR_MUTE, "0");
+	}
 
-    return;
+	return;
 }
 
 DBG_STATIC int control_notify_subscription(void)
 {
-    char *buf;
+	char *buf;
 
-   	ithread_mutex_lock(&control_mutex);
+	ithread_mutex_lock(&control_mutex);
 
-    control_update_settings();
+	control_update_settings();
 
-    // Construct LastChange event
+	// Construct LastChange event
 	asprintf(&buf,
 		 "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/RCS/\">"
 		 "<InstanceID val=\"0\"><%s Channel=\"Master\" val=\"%s\"/><%s Channel=\"Master\" val=\"%s\"/></InstanceID></Event>",
 		 control_variables[CONTROL_VAR_VOLUME], control_values[CONTROL_VAR_VOLUME],
-         control_variables[CONTROL_VAR_MUTE], control_values[CONTROL_VAR_MUTE]);
+		 control_variables[CONTROL_VAR_MUTE], control_values[CONTROL_VAR_MUTE]);
 
 	control_set_var(CONTROL_VAR_LAST_CHANGE, buf);
 
 	ithread_mutex_unlock(&control_mutex);
 
-    return 0;
+	return 0;
 }
 DBG_STATIC int cmd_obtain_variable(struct action_event *event, int varnum, char *paramname)
 {
 	if(upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_CONTROL_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_CONTROL_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
@@ -624,12 +667,12 @@ DBG_STATIC int get_mute(struct action_event *event)
 
 DBG_STATIC int set_mute(struct action_event *event)
 {
-    char *value;
-    int rc = 0;
+	char *value;
+	int rc = 0;
 
-    if (upnp_obtain_instanceid(event, NULL))
+	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_CONTROL_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_CONTROL_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
@@ -641,14 +684,16 @@ DBG_STATIC int set_mute(struct action_event *event)
 
 	ithread_mutex_lock(&control_mutex);
 
-    // Simulate mute function
-    if (strcmp(value, "1") == 0)
-        output_set_mute(TRUE);
-    else if (strcmp(value, "0") == 0) {
-        output_set_mute(FALSE);
-        control_change_var(event, CONTROL_VAR_VOLUME, (char *)output_get_volume());
-    } else
-        printf("Unknown mute option: %s\n", value);
+	// Simulate mute function
+	if (strcmp(value, "1") == 0)
+		output_set_mute(TRUE);
+	else if (strcmp(value, "0") == 0)
+	{
+		output_set_mute(FALSE);
+		control_change_var(event, CONTROL_VAR_VOLUME, (char *)output_get_volume());
+	}
+	else
+		printf("Unknown mute option: %s\n", value);
 
 	control_change_var(event, CONTROL_VAR_MUTE, value);
 
@@ -656,14 +701,14 @@ DBG_STATIC int set_mute(struct action_event *event)
 
 	ithread_mutex_unlock(&control_mutex);
 
-    return rc;
+	return rc;
 }
 
 DBG_STATIC int get_volume(struct action_event *event)
 {
 	ithread_mutex_lock(&control_mutex);
 
-    control_set_var(CONTROL_VAR_VOLUME, (char *)output_get_volume());
+	control_set_var(CONTROL_VAR_VOLUME, (char *)output_get_volume());
 
 	ithread_mutex_unlock(&control_mutex);
 	/* FIXME - Channel */
@@ -672,12 +717,12 @@ DBG_STATIC int get_volume(struct action_event *event)
 
 DBG_STATIC int set_volume(struct action_event *event)
 {
-    char *value;
-    int rc = 0;
+	char *value;
+	int rc = 0;
 
-    if (upnp_obtain_instanceid(event, NULL))
+	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_CONTROL_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_CONTROL_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
@@ -689,19 +734,19 @@ DBG_STATIC int set_volume(struct action_event *event)
 
 	DBG_PRINT(DBG_LVL4, "%s: DesiredVolume='%s'\n", __FUNCTION__, value);
 
-    // do the work
+	// do the work
 	output_set_volume(value);
 
 	control_change_var(event, CONTROL_VAR_VOLUME, value);
 
 	free(value);
 
-    // Reset mute state
+	// Reset mute state
 	control_change_var(event, CONTROL_VAR_MUTE, "0");
 
 	ithread_mutex_unlock(&control_mutex);
 
-    return rc;
+	return rc;
 }
 
 DBG_STATIC int get_volume_db(struct action_event *event)
@@ -717,7 +762,8 @@ DBG_STATIC int get_loudness(struct action_event *event)
 }
 
 
-static struct action control_actions[] = {
+static struct action control_actions[] =
+{
 	[CONTROL_CMD_LIST_PRESETS] =        	{"ListPresets", list_presets},
 	[CONTROL_CMD_SELECT_PRESET] =       	{"SelectPreset", NULL},
 #if defined(UPNP_VIDEO)
@@ -759,12 +805,13 @@ static struct action control_actions[] = {
 };
 
 
-struct service control_service = {
+struct service control_service =
+{
 	.service_name =	    CONTROL_SERVICE,
 	.type =	            CONTROL_TYPE,
-    .scpd_url =         CONTROL_SCPD_URL,
-    .control_url =      CONTROL_CONTROL_URL,
-    .event_url =        CONTROL_EVENT_URL,
+	.scpd_url =         CONTROL_SCPD_URL,
+	.control_url =      CONTROL_CONTROL_URL,
+	.event_url =        CONTROL_EVENT_URL,
 	.actions =	        control_actions,
 	.action_arguments =	argument_list,
 	.variable_names =	control_variables,
@@ -779,7 +826,7 @@ struct service control_service = {
 
 void control_init(void)
 {
-    memset(control_values, 0, sizeof(control_values));
+	memset(control_values, 0, sizeof(control_values));
 
-    return;
+	return;
 }

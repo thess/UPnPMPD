@@ -46,7 +46,8 @@
 #define PKG_DATADIR "/usr/local/share/upnpmpd"
 #endif
 
-typedef struct {
+typedef struct
+{
 	off_t pos;
 	const char *contents;
 	size_t len;
@@ -54,7 +55,8 @@ typedef struct {
 
 struct virtual_file;
 
-static struct virtual_file {
+static struct virtual_file
+{
 	const char *virtual_fname;
 	const char *contents;
 	const char *content_type;
@@ -68,7 +70,8 @@ int webserver_register_buf(const char *path, const char *contents, const char *c
 	struct virtual_file *entry;
 
 	entry = malloc(sizeof(struct virtual_file));
-	if (entry == NULL) {
+	if (entry == NULL)
+	{
 		goto out;
 	}
 	entry->len = strlen(contents);
@@ -94,25 +97,30 @@ int webserver_register_file(const char *path, const char *content_type)
 	snprintf(local_fname, PATH_MAX, "%s%s", PKG_DATADIR, strrchr(path, '/'));
 
 	rc = stat(local_fname, &buf);
-	if (rc) {
+	if (rc)
+	{
 		error(0, errno, "Could not stat '%s'", local_fname);
 		goto out;
 	}
 
 	entry = malloc(sizeof(struct virtual_file));
-	if (entry == NULL) {
+	if (entry == NULL)
+	{
 		goto out;
 	}
-	if (buf.st_size) {
+	if (buf.st_size)
+	{
 		char *cbuf;
 		FILE *in;
 		in = fopen(local_fname, "r");
-		if (in == NULL) {
+		if (in == NULL)
+		{
 			free(entry);
 			goto out;
 		}
 		cbuf = malloc(buf.st_size);
-		if (cbuf == NULL) {
+		if (cbuf == NULL)
+		{
 			free(entry);
 			goto out;
 		}
@@ -121,7 +129,9 @@ int webserver_register_file(const char *path, const char *content_type)
 		entry->len = buf.st_size;
 		entry->contents = cbuf;
 
-	} else {
+	}
+	else
+	{
 		entry->len = 0;
 		entry->contents = NULL;
 	}
@@ -141,20 +151,22 @@ DBG_STATIC int webserver_get_info(const char *filename, struct File_Info *info)
 
 	DBG_PRINT(DBG_LVL4, "%s:(filename='%s',info=%p)\n", __FUNCTION__, filename, info);
 
-	while (virtfile != NULL) {
-		if (strcmp(filename, virtfile->virtual_fname) == 0) {
+	while (virtfile != NULL)
+	{
+		if (strcmp(filename, virtfile->virtual_fname) == 0)
+		{
 			info->file_length = virtfile->len;
 			info->last_modified = 0;
 			info->is_directory = 0;
 			info->is_readable = 1;
 			info->content_type =
-			    ixmlCloneDOMString(virtfile->content_type);
+				ixmlCloneDOMString(virtfile->content_type);
 			result = 0;
 			goto out;
 		}
 		virtfile = virtfile->next;
 	}
-        printf("Virtual file: '%s' - not found\n", filename);
+	printf("Virtual file: '%s' - not found\n", filename);
 out:
 	return result;
 }
@@ -165,15 +177,18 @@ webserver_open(const char *filename, enum UpnpOpenFileMode mode)
 	struct virtual_file *virtfile = virtual_files;
 	WebServerFile *file = NULL;
 
-	if (mode != UPNP_READ) {
+	if (mode != UPNP_READ)
+	{
 		fprintf(stderr,
 			"%s: ignoring request to open file for writing\n",
 			filename);
 		goto out;
 	}
 
-	while (virtfile != NULL) {
-		if (strcmp(filename, virtfile->virtual_fname) == 0) {
+	while (virtfile != NULL)
+	{
+		if (strcmp(filename, virtfile->virtual_fname) == 0)
+		{
 			file = malloc(sizeof(WebServerFile));
 			file->pos = 0;
 			file->len = virtfile->len;
@@ -200,9 +215,12 @@ DBG_STATIC int webserver_read(UpnpWebFileHandle fh, char *buf, size_t buflen)
 	len = minimum(buflen, file->len - file->pos);
 	memcpy(buf, file->contents + file->pos, len);
 
-	if (len < 0) {
+	if (len < 0)
+	{
 		error(0, errno, "%s failed", __FUNCTION__);
-	} else {
+	}
+	else
+	{
 		file->pos += len;
 	}
 
@@ -220,7 +238,8 @@ DBG_STATIC int webserver_seek(UpnpWebFileHandle fh, off_t offset, int origin)
 	off_t newpos = -1;
 	int result = -1;
 
-	switch (origin) {
+	switch (origin)
+	{
 	case SEEK_SET:
 		newpos = offset;
 		break;
@@ -232,7 +251,8 @@ DBG_STATIC int webserver_seek(UpnpWebFileHandle fh, off_t offset, int origin)
 		break;
 	}
 
-	if (newpos < 0 || newpos > file->len) {
+	if (newpos < 0 || newpos > file->len)
+	{
 		error(0, errno, "%s seek failed", __FUNCTION__);
 		goto out;
 	}
@@ -252,7 +272,8 @@ DBG_STATIC int webserver_close(UpnpWebFileHandle fh)
 	return 0;
 }
 
-struct UpnpVirtualDirCallbacks virtual_dir_callbacks = {
+struct UpnpVirtualDirCallbacks virtual_dir_callbacks =
+{
 	webserver_get_info,
 	webserver_open,
 	webserver_read,

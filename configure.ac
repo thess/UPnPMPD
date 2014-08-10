@@ -1,8 +1,8 @@
 AC_PREREQ(2.59)
-AC_INIT(UPnPMPD, 1.1.2, http://www.kitschensync.com/upnpmpd)
+AC_INIT(UPnPMPD, 1.1.3, http://www.kitschensync.com/upnpmpd)
 AC_CONFIG_SRCDIR(src/main.c)
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 
 AM_INIT_AUTOMAKE([1.8 dist-bzip2 no-dist-gzip check-news])
@@ -22,15 +22,15 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
-EXTRA_GCC_DEBUG_CFLAGS="" 
+EXTRA_GCC_DEBUG_CFLAGS=""
 EXTRA_GCC_DEBUG_CXXFLAGS=""
-  
+
 if test -n "$GCC"; then
    EXTRA_GCC_DEBUG_CFLAGS="$CFLAGS"
    EXTRA_GCC_DEBUG_CXXFLAGS="$CXXFLAGS"
    CFLAGS="-Wall -Wpointer-arith -Wcast-align -Wmissing-prototypes -Wmissing-declarations"
    CXXFLAGS="-Wall -Wpointer-arith -Wcast-align"
-fi  
+fi
 
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.12 gthread-2.0],,
 	                  [AC_MSG_ERROR([GLib 2.12 is required])])

@@ -48,7 +48,8 @@
 #define CONNMGR_EVENT_URL "/upnp/event/renderconnmgr1"
 
 
-typedef enum {
+typedef enum
+{
 	CONNMGR_VAR_AAT_CONN_MGR,
 	CONNMGR_VAR_SINK_PROTO_INFO,
 	CONNMGR_VAR_AAT_CONN_STATUS,
@@ -63,7 +64,8 @@ typedef enum {
 	CONNMGR_VAR_COUNT
 } connmgr_variable;
 
-typedef enum {
+typedef enum
+{
 	CONNMGR_CMD_GETCURRENTCONNECTIONIDS,
 	CONNMGR_CMD_SETCURRENTCONNECTIONINFO,
 	CONNMGR_CMD_GETPROTOCOLINFO,
@@ -75,16 +77,19 @@ typedef enum {
 
 static struct action connmgr_actions[];
 
-static struct argument *arguments_getprotocolinfo[] = {
+static struct argument *arguments_getprotocolinfo[] =
+{
 	& (struct argument) { "Source", PARAM_DIR_OUT, CONNMGR_VAR_SRC_PROTO_INFO },
 	& (struct argument) { "Sink", PARAM_DIR_OUT, CONNMGR_VAR_SINK_PROTO_INFO },
-        NULL
+	NULL
 };
-static struct argument *arguments_getcurrentconnectionids[] = {
+static struct argument *arguments_getcurrentconnectionids[] =
+{
 	& (struct argument) { "ConnectionIDs", PARAM_DIR_OUT, CONNMGR_VAR_CUR_CONN_IDS },
-        NULL
+	NULL
 };
-static struct argument *arguments_setcurrentconnectioninfo[] = {
+static struct argument *arguments_setcurrentconnectioninfo[] =
+{
 	& (struct argument) { "ConnectionID", PARAM_DIR_IN, CONNMGR_VAR_AAT_CONN_ID },
 	& (struct argument) { "RcsID", PARAM_DIR_OUT, CONNMGR_VAR_AAT_RCS_ID },
 	& (struct argument) { "AVTransportID", PARAM_DIR_OUT, CONNMGR_VAR_AAT_AVT_ID },
@@ -93,7 +98,7 @@ static struct argument *arguments_setcurrentconnectioninfo[] = {
 	& (struct argument) { "PeerConnectionID", PARAM_DIR_OUT, CONNMGR_VAR_AAT_CONN_ID },
 	& (struct argument) { "Direction", PARAM_DIR_OUT, CONNMGR_VAR_AAT_DIR },
 	& (struct argument) { "Status", PARAM_DIR_OUT, CONNMGR_VAR_AAT_CONN_STATUS },
-        NULL
+	NULL
 };
 //static struct argument *arguments_prepareforconnection[] = {
 //	& (struct argument) { "RemoteProtocolInfo", PARAM_DIR_IN, CONNMGR_VAR_AAT_PROTO_INFO },
@@ -110,7 +115,8 @@ static struct argument *arguments_setcurrentconnectioninfo[] = {
 //        NULL
 //};
 
-static struct argument **argument_list[] = {
+static struct argument **argument_list[] =
+{
 	[CONNMGR_CMD_GETPROTOCOLINFO] = 			arguments_getprotocolinfo,
 	[CONNMGR_CMD_GETCURRENTCONNECTIONIDS] =		arguments_getcurrentconnectionids,
 	[CONNMGR_CMD_SETCURRENTCONNECTIONINFO] =	arguments_setcurrentconnectioninfo,
@@ -119,7 +125,8 @@ static struct argument **argument_list[] = {
 	[CONNMGR_CMD_UNKNOWN]	=	NULL
 };
 
-static const char *connmgr_variables[] = {
+static const char *connmgr_variables[] =
+{
 	[CONNMGR_VAR_SRC_PROTO_INFO] = "SourceProtocolInfo",
 	[CONNMGR_VAR_SINK_PROTO_INFO] = "SinkProtocolInfo",
 	[CONNMGR_VAR_CUR_CONN_IDS] = "CurrentConnectionIDs",
@@ -133,7 +140,8 @@ static const char *connmgr_variables[] = {
 	[CONNMGR_VAR_UNKNOWN] = NULL
 };
 
-static const char *connmgr_defaults[] = {
+static const char *connmgr_defaults[] =
+{
 	[CONNMGR_VAR_SRC_PROTO_INFO] = "",
 	[CONNMGR_VAR_SINK_PROTO_INFO] = "http-get:*:audio/mpeg:*",
 	[CONNMGR_VAR_CUR_CONN_IDS] = "0",
@@ -149,7 +157,8 @@ static const char *connmgr_defaults[] = {
 
 static char *connmgr_values[sizeof(connmgr_defaults) / sizeof(char *)];
 
-static const char *connstatus_values[] = {
+static const char *connstatus_values[] =
+{
 	"OK",
 	"ContentFormatMismatch",
 	"InsufficientBandwidth",
@@ -157,13 +166,15 @@ static const char *connstatus_values[] = {
 	"Unknown",
 	NULL
 };
-static const char *direction_values[] = {
+static const char *direction_values[] =
+{
 	"Input",
 	"Output",
 	NULL
 };
 
-static struct var_meta connmgr_var_meta[] = {
+static struct var_meta connmgr_var_meta[] =
+{
 	[CONNMGR_VAR_SRC_PROTO_INFO] =	{ SENDEVENT_YES, DATATYPE_STRING, NULL, NULL },
 	[CONNMGR_VAR_SINK_PROTO_INFO] =	{ SENDEVENT_YES, DATATYPE_STRING, NULL, NULL },
 	[CONNMGR_VAR_CUR_CONN_IDS] =	{ SENDEVENT_YES, DATATYPE_STRING, NULL, NULL },
@@ -181,7 +192,8 @@ static ithread_mutex_t connmgr_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 struct mime_type;
-static struct mime_type {
+static struct mime_type
+{
 	const char *mime_type;
 	struct mime_type *next;
 } *supported_types = NULL;
@@ -190,8 +202,10 @@ DBG_STATIC void register_mime_type_internal(const char *mime_type)
 {
 	struct mime_type *entry;
 
-	for (entry = supported_types; entry; entry = entry->next) {
-		if (strcmp(entry->mime_type, mime_type) == 0) {
+	for (entry = supported_types; entry; entry = entry->next)
+	{
+		if (strcmp(entry->mime_type, mime_type) == 0)
+		{
 			return;
 		}
 	}
@@ -206,7 +220,8 @@ DBG_STATIC void register_mime_type_internal(const char *mime_type)
 void register_mime_type(const char *mime_type)
 {
 	register_mime_type_internal(mime_type);
-	if (strcmp("audio/mpeg", mime_type) == 0) {
+	if (strcmp("audio/mpeg", mime_type) == 0)
+	{
 		register_mime_type_internal("audio/x-mpeg");
 	}
 }
@@ -218,27 +233,31 @@ int connmgr_init(void)
 	char *p;
 	int offset;
 	int bufsize = 0;
-    int len_type;
+	int len_type;
 
 	// Clear variable dynamic data
 	memset(connmgr_values, 0, sizeof(connmgr_values));
 
 	for (entry = supported_types; entry; entry = entry->next)
 	{
-        len_type = strlen(entry->mime_type);
+		len_type = strlen(entry->mime_type);
 		bufsize += len_type + 1 + 8 + 3 + 2;
 		if (buf)
 		{
-		    // calc new offset from origin
-		    offset = p - buf;
-		    buf = realloc(buf, bufsize);
-		} else {
-		    // allocate first buf
-            buf = malloc(bufsize);
-            p = buf; offset = 0;
+			// calc new offset from origin
+			offset = p - buf;
+			buf = realloc(buf, bufsize);
+		}
+		else
+		{
+			// allocate first buf
+			buf = malloc(bufsize);
+			p = buf;
+			offset = 0;
 		}
 
-		if (buf == NULL) {
+		if (buf == NULL)
+		{
 			fprintf(stderr, "%s: allocation failed (%d)\n", __FUNCTION__, bufsize);
 			return -1;
 		}
@@ -254,7 +273,7 @@ int connmgr_init(void)
 
 	if (buf)
 	{
-	    // remove punctuation
+		// remove punctuation
 		*(--p) = '\0';
 	}
 
@@ -335,7 +354,8 @@ out:
 }
 
 
-static struct action connmgr_actions[] = {
+static struct action connmgr_actions[] =
+{
 	[CONNMGR_CMD_GETPROTOCOLINFO] =		{"GetProtocolInfo", get_protocol_info},
 	[CONNMGR_CMD_GETCURRENTCONNECTIONIDS] =	{"GetCurrentConnectionIDs", get_current_conn_ids},
 	[CONNMGR_CMD_SETCURRENTCONNECTIONINFO] ={"GetCurrentConnectionInfo", get_current_conn_info},
@@ -344,21 +364,22 @@ static struct action connmgr_actions[] = {
 	[CONNMGR_CMD_UNKNOWN] =			{NULL, NULL}
 };
 
-struct service connmgr_service = {
-        .service_name =		    CONNMGR_SERVICE,
-        .type =			        CONNMGR_TYPE,
-        .scpd_url =		        CONNMGR_SCPD_URL,
-        .control_url =		    CONNMGR_CONTROL_URL,
-        .event_url =		    CONNMGR_EVENT_URL,
-        .actions =	        	connmgr_actions,
-        .action_arguments =     argument_list,
-        .variable_names =       connmgr_variables,
-        .variable_values =      connmgr_values,
-        .variable_defaults =    connmgr_defaults,
-        .variable_meta =        connmgr_var_meta,
-        .variable_count =       CONNMGR_VAR_UNKNOWN,
-        .command_count =        CONNMGR_CMD_UNKNOWN,
-        .service_mutex =        &connmgr_mutex,
-        .subscription_notify =  NULL
+struct service connmgr_service =
+{
+	.service_name =		    CONNMGR_SERVICE,
+	.type =			        CONNMGR_TYPE,
+	.scpd_url =		        CONNMGR_SCPD_URL,
+	.control_url =		    CONNMGR_CONTROL_URL,
+	.event_url =		    CONNMGR_EVENT_URL,
+	.actions =	        	connmgr_actions,
+	.action_arguments =     argument_list,
+	.variable_names =       connmgr_variables,
+	.variable_values =      connmgr_values,
+	.variable_defaults =    connmgr_defaults,
+	.variable_meta =        connmgr_var_meta,
+	.variable_count =       CONNMGR_VAR_UNKNOWN,
+	.command_count =        CONNMGR_CMD_UNKNOWN,
+	.service_mutex =        &connmgr_mutex,
+	.subscription_notify =  NULL
 };
 

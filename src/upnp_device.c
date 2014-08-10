@@ -56,23 +56,26 @@ static struct device *upnp_device;
 
 DBG_STATIC const char *get_service_var(struct service *srv, int varnum)
 {
-    char *val = NULL;
-    if (srv->variable_values[varnum] != NULL) {
-        val = srv->variable_values[varnum];
-    } else {
-        if ((srv->variable_defaults != NULL) && (srv->variable_defaults[varnum] != NULL))
-            val = (char *)srv->variable_defaults[varnum];
-    }
+	char *val = NULL;
+	if (srv->variable_values[varnum] != NULL)
+	{
+		val = srv->variable_values[varnum];
+	}
+	else
+	{
+		if ((srv->variable_defaults != NULL) && (srv->variable_defaults[varnum] != NULL))
+			val = (char *)srv->variable_defaults[varnum];
+	}
 
-    if (val == NULL)
-    {
-        val = "";
-        printf("Variable %s is empty\n", srv->variable_names[varnum]);
-    }
+	if (val == NULL)
+	{
+		val = "";
+		printf("Variable %s is empty\n", srv->variable_names[varnum]);
+	}
 
-   DBG_PRINT(DBG_LVL5, "%s: returned %s for %s\n", __FUNCTION__, val, srv->variable_names[varnum]);
+	DBG_PRINT(DBG_LVL5, "%s: returned %s for %s\n", __FUNCTION__, val, srv->variable_names[varnum]);
 
-   return val;
+	return val;
 }
 
 int
@@ -81,14 +84,16 @@ upnp_add_response(struct action_event *event, char *key, const char *value)
 	int rc;
 	int result = -1;
 
-	if (event->status) {
+	if (event->status)
+	{
 		goto out;
 	}
 
 	rc = UpnpAddToActionResponse(&event->request->ActionResult,
-                                 event->request->ActionName,
-                                 event->service->type, key, value);
-	if (rc != UPNP_E_SUCCESS) {
+				     event->request->ActionName,
+				     event->service->type, key, value);
+	if (rc != UPNP_E_SUCCESS)
+	{
 		/* report custom error */
 		event->request->ActionResult = NULL;
 		event->request->ErrCode = UPNP_SOAP_E_ACTION_FAILED;
@@ -107,7 +112,8 @@ int upnp_append_variable(struct action_event *event, int varnum, char *paramname
 	struct service *service = event->service;
 	int retval = -1;
 
-	if (varnum >= service->variable_count) {
+	if (varnum >= service->variable_count)
+	{
 		upnp_set_error(event, UPNP_E_INTERNAL_ERROR,
 			       "Internal Error - illegal variable number %d",
 			       varnum);
@@ -117,9 +123,12 @@ int upnp_append_variable(struct action_event *event, int varnum, char *paramname
 	ithread_mutex_lock(service->service_mutex);
 
 	value = get_service_var(service, varnum);
-	if (value == NULL) {
+	if (value == NULL)
+	{
 		upnp_set_error(event, UPNP_E_INTERNAL_ERROR, "Internal Error");
-	} else {
+	}
+	else
+	{
 		retval = upnp_add_response(event, paramname, value);
 	}
 
@@ -149,14 +158,16 @@ char *upnp_get_string(struct action_event *event, const char *key)
 	IXML_Node *node;
 
 	node = (IXML_Node *) event->request->ActionRequest;
-	if (node == NULL) {
+	if (node == NULL)
+	{
 		upnp_set_error(event, UPNP_SOAP_E_INVALID_ARGS,
 			       "Invalid action request document");
 		return NULL;
 	}
 
 	node = ixmlNode_getFirstChild(node);
-	if (node == NULL) {
+	if (node == NULL)
+	{
 		upnp_set_error(event, UPNP_SOAP_E_INVALID_ARGS,
 			       "Invalid action request document");
 		return NULL;
@@ -165,9 +176,11 @@ char *upnp_get_string(struct action_event *event, const char *key)
 
 	for (; node != NULL; node = ixmlNode_getNextSibling(node))
 	{
-		if (strcmp(ixmlNode_getNodeName(node), key) == 0) {
+		if (strcmp(ixmlNode_getNodeName(node), key) == 0)
+		{
 			node = ixmlNode_getFirstChild(node);
-			if (node == NULL) {
+			if (node == NULL)
+			{
 				/* Are we sure empty arguments are reported like this? */
 				return strdup("");
 			}
@@ -186,21 +199,22 @@ int upnp_obtain_instanceid(struct action_event *event, int *instance)
 	int instance_id = -1;
 
 	value = upnp_get_string(event, "InstanceID");
-	if (value == NULL) {
+	if (value == NULL)
+	{
 		upnp_set_error(event, UPNP_SOAP_E_INVALID_ARGS, "Missing InstanceID");
 		return -1;
 	}
 
 	DBG_PRINT(DBG_LVL5, "%s: InstanceID='%s'\n", __FUNCTION__, value);
 
-    // Check numeric?
-    instance_id = atoi(value);
-    if (instance)
-        *instance = instance_id;
+	// Check numeric?
+	instance_id = atoi(value);
+	if (instance)
+		*instance = instance_id;
 
 	free(value);
 
-    // We are only allowing '0' InstanceID for now
+	// We are only allowing '0' InstanceID for now
 	return (instance_id != 0) ? -1 : 0;
 }
 
@@ -222,18 +236,18 @@ DBG_STATIC int handle_subscription_request(struct Upnp_Subscription_Request *sr_
 	if (srv == NULL)
 	{
 		fprintf(stderr, "%s: Unknown service '%s'\n", __FUNCTION__,
-                        sr_event->ServiceId);
+			sr_event->ServiceId);
 		goto out;
 	}
 
 	ithread_mutex_lock(&(upnp_device->device_mutex));
 
-    // Does service have a notify routine
-    if (srv->subscription_notify)
-    {
-        // Update LAST_CHANGE before sending it
-        (srv->subscription_notify)();
-    }
+	// Does service have a notify routine
+	if (srv->subscription_notify)
+	{
+		// Update LAST_CHANGE before sending it
+		(srv->subscription_notify)();
+	}
 
 	/* generate list of eventable variables */
 	for(i=0; i < srv->variable_count; i++)
@@ -257,8 +271,8 @@ DBG_STATIC int handle_subscription_request(struct Upnp_Subscription_Request *sr_
 			eventvar_names[eventVarIdx] = srv->variable_names[i];
 			eventvar_values[eventVarIdx] = xmlescape(get_service_var(srv, i), 0);
 			DBG_PRINT(DBG_LVL4, "Evented: '%s' = '%s'\n",
-                    eventvar_names[eventVarIdx],
-                    eventvar_values[eventVarIdx]);
+				  eventvar_names[eventVarIdx],
+				  eventvar_values[eventVarIdx]);
 			eventVarIdx++;
 		}
 	}
@@ -266,12 +280,13 @@ DBG_STATIC int handle_subscription_request(struct Upnp_Subscription_Request *sr_
 	eventvar_values[eventVarIdx] = NULL;
 
 	rc = UpnpAcceptSubscription(device_handle,
-                               sr_event->UDN, sr_event->ServiceId,
-                               (const char **)eventvar_names,
-                               (const char **)eventvar_values,
-                               eventVarCount,
-                               sr_event->Sid);
-	if (rc == UPNP_E_SUCCESS) {
+				    sr_event->UDN, sr_event->ServiceId,
+				    (const char **)eventvar_names,
+				    (const char **)eventvar_values,
+				    eventVarCount,
+				    sr_event->Sid);
+	if (rc == UPNP_E_SUCCESS)
+	{
 		result = 0;
 	}
 
@@ -279,11 +294,11 @@ DBG_STATIC int handle_subscription_request(struct Upnp_Subscription_Request *sr_
 
 	for(i=0; i < eventVarCount; i++)
 	{
-	    // Free temp value storage
+		// Free temp value storage
 		free(eventvar_values[i]);
 	}
 
-    // Release arrays
+	// Release arrays
 	free(eventvar_names);
 	free(eventvar_values);
 
@@ -303,7 +318,7 @@ DBG_STATIC int handle_action_request(struct Upnp_Action_Request *ar_event)
 	if (event_action == NULL)
 	{
 		fprintf(stderr, "Unknown action '%s' for service '%s'\n",
-                        ar_event->ActionName, ar_event->ServiceID);
+			ar_event->ActionName, ar_event->ServiceID);
 		ar_event->ActionResult = NULL;
 		ar_event->ErrCode = 401;
 		return -1;
@@ -318,18 +333,22 @@ DBG_STATIC int handle_action_request(struct Upnp_Action_Request *ar_event)
 		event.service = event_service;
 
 		rc = (event_action->callback) (&event);
-		if (rc == 0) {
+		if (rc == 0)
+		{
 			ar_event->ErrCode = UPNP_E_SUCCESS;
 			DBG_PRINT(DBG_LVL4, "Action: %s succeeded\n", ar_event->ActionName);
 		}
 
-		if (ar_event->ActionResult == NULL) {
+		if (ar_event->ActionResult == NULL)
+		{
 			ar_event->ActionResult =
-			    UpnpMakeActionResponse(ar_event->ActionName,
-                                       ar_event->ServiceID, 0,
-                                       NULL);
+				UpnpMakeActionResponse(ar_event->ActionName,
+						       ar_event->ServiceID, 0,
+						       NULL);
 		}
-	} else {
+	}
+	else
+	{
 		fprintf(stderr, "Got a valid action, but no handler defined (!)\n");
 		fprintf(stderr, "  ErrCode:    %d\n", ar_event->ErrCode);
 		fprintf(stderr, "  Socket:     %d\n", ar_event->Socket);
@@ -379,7 +398,8 @@ int upnp_device_init(struct device *device_def, char *ip_address)
 	if (device_def->init_function)
 	{
 		rc = device_def->init_function();
-		if (rc != 0) {
+		if (rc != 0)
+		{
 			goto out;
 		}
 	}
@@ -387,17 +407,17 @@ int upnp_device_init(struct device *device_def, char *ip_address)
 	upnp_device = device_def;
 
 	/* register icons in web server */
-    for (i=0; (icon_entry = upnp_device->icons[i]); i++)
-    {
-        webserver_register_file(icon_entry->url, "image/png");
-    }
+	for (i=0; (icon_entry = upnp_device->icons[i]); i++)
+	{
+		webserver_register_file(icon_entry->url, "image/png");
+	}
 
 	/* generate and register service schemas in web server */
-    for (i=0; (srv = upnp_device->services[i]); i++)
-    {
-        buf = upnp_get_scpd(srv);
-        printf("registering '%s'\n", srv->scpd_url);
-        webserver_register_buf(srv->scpd_url, buf, "text/xml");
+	for (i=0; (srv = upnp_device->services[i]); i++)
+	{
+		buf = upnp_get_scpd(srv);
+		printf("registering '%s'\n", srv->scpd_url);
+		webserver_register_buf(srv->scpd_url, buf, "text/xml");
 	}
 
 
@@ -426,12 +446,12 @@ int upnp_device_init(struct device *device_def, char *ip_address)
 		goto upnp_err_out;
 	}
 
-    buf = upnp_get_device_desc(device_def);
+	buf = upnp_get_device_desc(device_def);
 
 	rc = UpnpRegisterRootDevice2(UPNPREG_BUF_DESC,
-                                 buf, strlen(buf), 1,
-                                 &event_handler, &device_def,
-                                 &device_handle);
+				     buf, strlen(buf), 1,
+				     &event_handler, &device_def,
+				     &device_handle);
 	if (UPNP_E_SUCCESS != rc)
 	{
 		printf("UpnpRegisterRootDevice2() Error: %d\n", rc);

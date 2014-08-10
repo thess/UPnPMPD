@@ -29,81 +29,91 @@ struct action;
 struct service;
 struct action_event;
 
-struct action {
+struct action
+{
 	const char *action_name;
 	int (*callback) (struct action_event *);
 };
 
-typedef enum {
-        PARAM_DIR_IN,
-        PARAM_DIR_OUT,
+typedef enum
+{
+	PARAM_DIR_IN,
+	PARAM_DIR_OUT,
 } param_dir;
 
-struct argument {
-        const char *name;
-        param_dir direction;
-        int statevar;
+struct argument
+{
+	const char *name;
+	param_dir direction;
+	int statevar;
 };
 
-typedef enum {
-        DATATYPE_STRING,
-        DATATYPE_BOOLEAN,
-        DATATYPE_I2,
-        DATATYPE_I4,
-        DATATYPE_UI2,
-        DATATYPE_UI4,
-        DATATYPE_UNKNOWN,
-        DATATYPE_COUNT
+typedef enum
+{
+	DATATYPE_STRING,
+	DATATYPE_BOOLEAN,
+	DATATYPE_I2,
+	DATATYPE_I4,
+	DATATYPE_UI2,
+	DATATYPE_UI4,
+	DATATYPE_UNKNOWN,
+	DATATYPE_COUNT
 } param_datatype;
 
-typedef enum {
-        SENDEVENT_NO,
-        SENDEVENT_YES
+typedef enum
+{
+	SENDEVENT_NO,
+	SENDEVENT_YES
 } param_event;
 
-struct param_range {
-        long long min;
-        long long max;
-        long long step;
+struct param_range
+{
+	long long min;
+	long long max;
+	long long step;
 };
 
-struct var_meta {
-        param_event     sendevents;
-        param_datatype  datatype;
-        const char      **allowed_values;
-        struct param_range      *allowed_range;
+struct var_meta
+{
+	param_event     sendevents;
+	param_datatype  datatype;
+	const char      **allowed_values;
+	struct param_range      *allowed_range;
 	const char      *default_value;
 };
 
 
-struct icon {
-        int width;
-        int height;
-        int depth;
-        const char *url;
-        const char *mimetype;
+struct icon
+{
+	int width;
+	int height;
+	int depth;
+	const char *url;
+	const char *mimetype;
 };
 
-struct device {
+struct device
+{
 	ithread_mutex_t device_mutex;
 	int (*init_function) (void);
-    const char *device_type;
-    const char *friendly_name;
-    const char *manufacturer;
-    const char *manufacturer_url;
-    const char *model_description;
-    const char *model_name;
-    const char *model_number;
-    const char *model_url;
-    const char *serial_number;
-    const char *udn;
-    const char *upc;
-    const char *presentation_url;
+	const char *device_type;
+	const char *friendly_name;
+	const char *manufacturer;
+	const char *manufacturer_url;
+	const char *model_description;
+	const char *model_name;
+	const char *model_number;
+	const char *model_url;
+	const char *serial_number;
+	const char *udn;
+	const char *upc;
+	const char *presentation_url;
 	struct icon **icons;
 	struct service **services;
 };
 
-struct service {
+struct service
+{
 	ithread_mutex_t *service_mutex;
 	const char *service_name;
 	char *type;
@@ -121,16 +131,17 @@ struct service {
 	int (*subscription_notify)(void);
 };
 
-struct action_event {
+struct action_event
+{
 	struct Upnp_Action_Request *request;
 	int status;
 	struct service *service;
 };
 
 struct service *find_service(struct device *device_def,
-                             char *service_name);
+			     char *service_name);
 struct action *find_action(struct service *event_service,
-                                  char *action_name);
+			   char *action_name);
 
 char *upnp_get_scpd(struct service *srv);
 char *upnp_get_device_desc(struct device *device_def);

@@ -28,7 +28,8 @@
 #define UPNP_CONTROL_E_INVALID_IID	702
 
 #if defined(UPNP_VIDEO)
-typedef enum {
+typedef enum
+{
 	CONTROL_VAR_G_GAIN,
 	CONTROL_VAR_B_BLACK,
 	CONTROL_VAR_VER_KEYSTONE,
@@ -54,7 +55,8 @@ typedef enum {
 	CONTROL_VAR_COUNT
 } control_variable;
 
-typedef enum {
+typedef enum
+{
 	CONTROL_CMD_GET_BLUE_BLACK,
 	CONTROL_CMD_GET_BLUE_GAIN,
 	CONTROL_CMD_GET_BRIGHTNESS,
@@ -96,7 +98,8 @@ typedef enum {
 
 #else
 // Audio device only
-typedef enum {
+typedef enum
+{
 	CONTROL_VAR_VOLUME,
 	CONTROL_VAR_LOUDNESS,
 	CONTROL_VAR_AAT_INSTANCE_ID,
@@ -110,7 +113,8 @@ typedef enum {
 	CONTROL_VAR_COUNT
 } control_variable;
 
-typedef enum {
+typedef enum
+{
 	CONTROL_CMD_GET_LOUDNESS,
 	CONTROL_CMD_GET_MUTE,
 	CONTROL_CMD_GET_VOL,

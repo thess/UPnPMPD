@@ -44,7 +44,8 @@
 #define UPNP_TRANSPORT_E_PLAYSPEED_NS	717
 #define UPNP_TRANSPORT_E_INVALID_IID	718
 
-typedef enum {
+typedef enum
+{
 	TRANSPORT_VAR_TRANSPORT_STATUS,
 	TRANSPORT_VAR_NEXT_AV_URI,
 	TRANSPORT_VAR_NEXT_AV_URI_META,
@@ -80,7 +81,8 @@ typedef enum {
 	TRANSPORT_VAR_COUNT
 } transport_variable;
 
-typedef enum {
+typedef enum
+{
 	TRANSPORT_CMD_GETCURRENTTRANSPORTACTIONS,
 	TRANSPORT_CMD_GETDEVICECAPABILITIES,
 	TRANSPORT_CMD_GETMEDIAINFO,
@@ -102,7 +104,8 @@ typedef enum {
 	TRANSPORT_CMD_COUNT
 } transport_cmd ;
 
-enum _transport_state {
+enum _transport_state
+{
 	TRANSPORT_STOPPED,
 	TRANSPORT_PLAYING,
 	TRANSPORT_TRANSITIONING,	/* optional */

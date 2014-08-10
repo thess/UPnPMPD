@@ -28,13 +28,14 @@
 #if defined(DEBUG)
 extern int g_debug;
 
-enum {
-    DBG_LVL0 = 0,
-    DBG_LVL1 = 1,
-    DBG_LVL2 = 2,
-    DBG_LVL3 = 3,
-    DBG_LVL4 = 4,
-    DBG_LVL5 = 5
+enum
+{
+	DBG_LVL0 = 0,
+	DBG_LVL1 = 1,
+	DBG_LVL2 = 2,
+	DBG_LVL3 = 3,
+	DBG_LVL4 = 4,
+	DBG_LVL5 = 5
 };
 
 #define DBG_STATIC

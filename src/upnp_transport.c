@@ -53,7 +53,8 @@
 #define TRANSPORT_CONTROL_URL "/upnp/control/rendertransport1"
 #define TRANSPORT_EVENT_URL "/upnp/event/rendertransport1"
 
-static const char *transport_variables[] = {
+static const char *transport_variables[] =
+{
 	[TRANSPORT_VAR_TRANSPORT_STATE] = "TransportState",
 	[TRANSPORT_VAR_TRANSPORT_STATUS] = "TransportStatus",
 	[TRANSPORT_VAR_PLAY_MEDIUM] = "PlaybackStorageMedium",
@@ -87,7 +88,8 @@ static const char *transport_variables[] = {
 	[TRANSPORT_VAR_UNKNOWN] = NULL
 };
 
-static const char *transport_defaults[] = {
+static const char *transport_defaults[] =
+{
 	[TRANSPORT_VAR_TRANSPORT_STATE] = "STOPPED",
 	[TRANSPORT_VAR_TRANSPORT_STATUS] = "OK",
 	[TRANSPORT_VAR_PLAY_MEDIUM] = "UNKNOWN",
@@ -113,7 +115,7 @@ static const char *transport_defaults[] = {
 	[TRANSPORT_VAR_ABS_TIME_POS] = "NOT_IMPLEMENTED",
 	[TRANSPORT_VAR_REL_CTR_POS] = "2147483647",
 	[TRANSPORT_VAR_ABS_CTR_POS] = "2147483647",
-    [TRANSPORT_VAR_LAST_CHANGE] = "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT/\"><InstanceID val=\"0\"></InstanceID></Event>",
+	[TRANSPORT_VAR_LAST_CHANGE] = "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT/\"><InstanceID val=\"0\"></InstanceID></Event>",
 	[TRANSPORT_VAR_AAT_SEEK_MODE] = "TRACK_NR",
 	[TRANSPORT_VAR_AAT_SEEK_TARGET] = "",
 	[TRANSPORT_VAR_AAT_INSTANCE_ID] = "0",
@@ -123,7 +125,8 @@ static const char *transport_defaults[] = {
 
 static char *transport_values[sizeof(transport_defaults) / sizeof(char *)];
 
-static const char *transport_states[] = {
+static const char *transport_states[] =
+{
 	"STOPPED",
 	"PAUSED_PLAYBACK",
 	"PAUSED_RECORDING",
@@ -133,13 +136,15 @@ static const char *transport_states[] = {
 	"NO_MEDIA_PRESENT",
 	NULL
 };
-static const char *transport_stati[] = {
+static const char *transport_stati[] =
+{
 	"OK",
 	"ERROR_OCCURRED",
 	" vendor-defined ",
 	NULL
 };
-static const char *media[] = {
+static const char *media[] =
+{
 	"UNKNOWN",
 	"DV",
 	"MINI-DV",
@@ -176,7 +181,8 @@ static const char *media[] = {
 	NULL
 };
 
-static const char *playmodi[] = {
+static const char *playmodi[] =
+{
 	"NORMAL",
 	//"SHUFFLE",
 	"REPEAT_ONE",
@@ -187,13 +193,15 @@ static const char *playmodi[] = {
 	NULL
 };
 
-static const char *playspeeds[] = {
+static const char *playspeeds[] =
+{
 	"1",
 	" vendor-defined ",
 	NULL
 };
 
-static const char *rec_write_stati[] = {
+static const char *rec_write_stati[] =
+{
 	"WRITABLE",
 	"PROTECTED",
 	"NOT_WRITABLE",
@@ -202,7 +210,8 @@ static const char *rec_write_stati[] = {
 	NULL
 };
 
-static const char *rec_quality_modi[] = {
+static const char *rec_quality_modi[] =
+{
 	"0:EP",
 	"1:LP",
 	"2:SP",
@@ -214,7 +223,8 @@ static const char *rec_quality_modi[] = {
 	NULL
 };
 
-static const char *aat_seekmodi[] = {
+static const char *aat_seekmodi[] =
+{
 	"ABS_TIME",
 	"REL_TIME",
 	"ABS_COUNT",
@@ -226,19 +236,22 @@ static const char *aat_seekmodi[] = {
 	NULL
 };
 
-static struct param_range track_range = {
+static struct param_range track_range =
+{
 	0,
 	4294967295LL,
 	1
 };
 
-static struct param_range track_nr_range = {
+static struct param_range track_nr_range =
+{
 	0,
 	4294967295LL,
 	0
 };
 
-static struct var_meta transport_var_meta[] = {
+static struct var_meta transport_var_meta[] =
+{
 	[TRANSPORT_VAR_TRANSPORT_STATE] =		{ SENDEVENT_NO, DATATYPE_STRING, transport_states, NULL },
 	[TRANSPORT_VAR_TRANSPORT_STATUS] =		{ SENDEVENT_NO, DATATYPE_STRING, transport_stati, NULL },
 	[TRANSPORT_VAR_PLAY_MEDIUM] =			{ SENDEVENT_NO, DATATYPE_STRING, media, NULL },
@@ -272,11 +285,12 @@ static struct var_meta transport_var_meta[] = {
 	[TRANSPORT_VAR_UNKNOWN] =			    { SENDEVENT_NO, DATATYPE_UNKNOWN, NULL, NULL }
 };
 
-static struct argument *arguments_setavtransporturi[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
-        & (struct argument) { "CurrentURI", PARAM_DIR_IN, TRANSPORT_VAR_AV_URI },
-        & (struct argument) { "CurrentURIMetaData", PARAM_DIR_IN, TRANSPORT_VAR_AV_URI_META },
-        NULL
+static struct argument *arguments_setavtransporturi[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	& (struct argument) { "CurrentURI", PARAM_DIR_IN, TRANSPORT_VAR_AV_URI },
+	& (struct argument) { "CurrentURIMetaData", PARAM_DIR_IN, TRANSPORT_VAR_AV_URI_META },
+	NULL
 };
 
 //static struct argument *arguments_setnextavtransporturi[] = {
@@ -286,67 +300,75 @@ static struct argument *arguments_setavtransporturi[] = {
 //        NULL
 //};
 
-static struct argument *arguments_getmediainfo[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
-        & (struct argument) { "NrTracks", PARAM_DIR_OUT, TRANSPORT_VAR_NR_TRACKS },
-        & (struct argument) { "MediaDuration", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_MEDIA_DUR },
-        & (struct argument) { "CurrentURI", PARAM_DIR_OUT, TRANSPORT_VAR_AV_URI },
-        & (struct argument) { "CurrentURIMetaData", PARAM_DIR_OUT, TRANSPORT_VAR_AV_URI_META },
-        & (struct argument) { "NextURI", PARAM_DIR_OUT, TRANSPORT_VAR_NEXT_AV_URI },
-        & (struct argument) { "NextURIMetaData", PARAM_DIR_OUT, TRANSPORT_VAR_NEXT_AV_URI_META },
-        & (struct argument) { "PlayMedium", PARAM_DIR_OUT, TRANSPORT_VAR_PLAY_MEDIUM },
-        & (struct argument) { "RecordMedium", PARAM_DIR_OUT, TRANSPORT_VAR_REC_MEDIUM },
-        & (struct argument) { "WriteStatus", PARAM_DIR_OUT, TRANSPORT_VAR_REC_MEDIUM_WR_STATUS },
-        NULL
-};
-
-static struct argument *arguments_gettransportinfo[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
-        & (struct argument) { "CurrentTransportState", PARAM_DIR_OUT, TRANSPORT_VAR_TRANSPORT_STATE },
-        & (struct argument) { "CurrentTransportStatus", PARAM_DIR_OUT, TRANSPORT_VAR_TRANSPORT_STATUS },
-        & (struct argument) { "CurrentSpeed", PARAM_DIR_OUT, TRANSPORT_VAR_TRANSPORT_PLAY_SPEED },
-        NULL
-};
-
-static struct argument *arguments_getpositioninfo[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
-        & (struct argument) { "Track", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_TRACK },
-        & (struct argument) { "TrackDuration", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_TRACK_DUR },
-        & (struct argument) { "TrackMetaData", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_TRACK_META },
-        & (struct argument) { "TrackURI", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_TRACK_URI },
-        & (struct argument) { "RelTime", PARAM_DIR_OUT, TRANSPORT_VAR_REL_TIME_POS },
-        & (struct argument) { "AbsTime", PARAM_DIR_OUT, TRANSPORT_VAR_ABS_TIME_POS },
-        & (struct argument) { "RelCount", PARAM_DIR_OUT, TRANSPORT_VAR_REL_CTR_POS },
-        & (struct argument) { "AbsCount", PARAM_DIR_OUT, TRANSPORT_VAR_ABS_CTR_POS },
-        NULL
-};
-
-static struct argument *arguments_getdevicecapabilities[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
-        & (struct argument) { "PlayMedia", PARAM_DIR_OUT, TRANSPORT_VAR_PLAY_MEDIA },
-        & (struct argument) { "RecMedia", PARAM_DIR_OUT, TRANSPORT_VAR_REC_MEDIA },
-        & (struct argument) { "RecQualityModes", PARAM_DIR_OUT, TRANSPORT_VAR_POS_REC_QUAL_MODE },
+static struct argument *arguments_getmediainfo[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	& (struct argument) { "NrTracks", PARAM_DIR_OUT, TRANSPORT_VAR_NR_TRACKS },
+	& (struct argument) { "MediaDuration", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_MEDIA_DUR },
+	& (struct argument) { "CurrentURI", PARAM_DIR_OUT, TRANSPORT_VAR_AV_URI },
+	& (struct argument) { "CurrentURIMetaData", PARAM_DIR_OUT, TRANSPORT_VAR_AV_URI_META },
+	& (struct argument) { "NextURI", PARAM_DIR_OUT, TRANSPORT_VAR_NEXT_AV_URI },
+	& (struct argument) { "NextURIMetaData", PARAM_DIR_OUT, TRANSPORT_VAR_NEXT_AV_URI_META },
+	& (struct argument) { "PlayMedium", PARAM_DIR_OUT, TRANSPORT_VAR_PLAY_MEDIUM },
+	& (struct argument) { "RecordMedium", PARAM_DIR_OUT, TRANSPORT_VAR_REC_MEDIUM },
+	& (struct argument) { "WriteStatus", PARAM_DIR_OUT, TRANSPORT_VAR_REC_MEDIUM_WR_STATUS },
 	NULL
 };
 
-static struct argument *arguments_gettransportsettings[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
-        & (struct argument) { "PlayMode", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_PLAY_MODE },
-        & (struct argument) { "RecQualityMode", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_REC_QUAL_MODE },
+static struct argument *arguments_gettransportinfo[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	& (struct argument) { "CurrentTransportState", PARAM_DIR_OUT, TRANSPORT_VAR_TRANSPORT_STATE },
+	& (struct argument) { "CurrentTransportStatus", PARAM_DIR_OUT, TRANSPORT_VAR_TRANSPORT_STATUS },
+	& (struct argument) { "CurrentSpeed", PARAM_DIR_OUT, TRANSPORT_VAR_TRANSPORT_PLAY_SPEED },
 	NULL
 };
 
-static struct argument *arguments_stop[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+static struct argument *arguments_getpositioninfo[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	& (struct argument) { "Track", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_TRACK },
+	& (struct argument) { "TrackDuration", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_TRACK_DUR },
+	& (struct argument) { "TrackMetaData", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_TRACK_META },
+	& (struct argument) { "TrackURI", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_TRACK_URI },
+	& (struct argument) { "RelTime", PARAM_DIR_OUT, TRANSPORT_VAR_REL_TIME_POS },
+	& (struct argument) { "AbsTime", PARAM_DIR_OUT, TRANSPORT_VAR_ABS_TIME_POS },
+	& (struct argument) { "RelCount", PARAM_DIR_OUT, TRANSPORT_VAR_REL_CTR_POS },
+	& (struct argument) { "AbsCount", PARAM_DIR_OUT, TRANSPORT_VAR_ABS_CTR_POS },
 	NULL
 };
-static struct argument *arguments_play[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
-        & (struct argument) { "Speed", PARAM_DIR_IN, TRANSPORT_VAR_TRANSPORT_PLAY_SPEED },
+
+static struct argument *arguments_getdevicecapabilities[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	& (struct argument) { "PlayMedia", PARAM_DIR_OUT, TRANSPORT_VAR_PLAY_MEDIA },
+	& (struct argument) { "RecMedia", PARAM_DIR_OUT, TRANSPORT_VAR_REC_MEDIA },
+	& (struct argument) { "RecQualityModes", PARAM_DIR_OUT, TRANSPORT_VAR_POS_REC_QUAL_MODE },
 	NULL
 };
-static struct argument *arguments_pause[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+
+static struct argument *arguments_gettransportsettings[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	& (struct argument) { "PlayMode", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_PLAY_MODE },
+	& (struct argument) { "RecQualityMode", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_REC_QUAL_MODE },
+	NULL
+};
+
+static struct argument *arguments_stop[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	NULL
+};
+static struct argument *arguments_play[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	& (struct argument) { "Speed", PARAM_DIR_IN, TRANSPORT_VAR_TRANSPORT_PLAY_SPEED },
+	NULL
+};
+static struct argument *arguments_pause[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
 	NULL
 };
 //static struct argument *arguments_record[] = {
@@ -354,23 +376,27 @@ static struct argument *arguments_pause[] = {
 //	NULL
 //};
 
-static struct argument *arguments_seek[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
-        & (struct argument) { "Unit", PARAM_DIR_IN, TRANSPORT_VAR_AAT_SEEK_MODE },
-        & (struct argument) { "Target", PARAM_DIR_IN, TRANSPORT_VAR_AAT_SEEK_TARGET },
+static struct argument *arguments_seek[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	& (struct argument) { "Unit", PARAM_DIR_IN, TRANSPORT_VAR_AAT_SEEK_MODE },
+	& (struct argument) { "Target", PARAM_DIR_IN, TRANSPORT_VAR_AAT_SEEK_TARGET },
 	NULL
 };
-static struct argument *arguments_next[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+static struct argument *arguments_next[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
 	NULL
 };
-static struct argument *arguments_previous[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+static struct argument *arguments_previous[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
 	NULL
 };
-static struct argument *arguments_setplaymode[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
-        & (struct argument) { "NewPlayMode", PARAM_DIR_IN, TRANSPORT_VAR_CUR_PLAY_MODE },
+static struct argument *arguments_setplaymode[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	& (struct argument) { "NewPlayMode", PARAM_DIR_IN, TRANSPORT_VAR_CUR_PLAY_MODE },
 	NULL
 };
 //static struct argument *arguments_setrecordqualitymode[] = {
@@ -378,14 +404,16 @@ static struct argument *arguments_setplaymode[] = {
 //        & (struct argument) { "NewRecordQualityMode", PARAM_DIR_IN, TRANSPORT_VAR_CUR_REC_QUAL_MODE },
 //	NULL
 //};
-static struct argument *arguments_getcurrenttransportactions[] = {
-        & (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
-        & (struct argument) { "Actions", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_TRANSPORT_ACTIONS },
+static struct argument *arguments_getcurrenttransportactions[] =
+{
+	& (struct argument) { "InstanceID", PARAM_DIR_IN, TRANSPORT_VAR_AAT_INSTANCE_ID },
+	& (struct argument) { "Actions", PARAM_DIR_OUT, TRANSPORT_VAR_CUR_TRANSPORT_ACTIONS },
 	NULL
 };
 
 
-static struct argument **argument_list[] = {
+static struct argument **argument_list[] =
+{
 	[TRANSPORT_CMD_SETAVTRANSPORTURI] =         arguments_setavtransporturi,
 	[TRANSPORT_CMD_GETDEVICECAPABILITIES] =     arguments_getdevicecapabilities,
 	[TRANSPORT_CMD_GETMEDIAINFO] =              arguments_getmediainfo,
@@ -418,7 +446,7 @@ static int get_media_info(struct action_event *event)
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
@@ -455,8 +483,8 @@ static int get_media_info(struct action_event *event)
 		goto out;
 
 	rc = upnp_append_variable(event,
-                              TRANSPORT_VAR_REC_MEDIUM_WR_STATUS,
-                              "WriteStatus");
+				  TRANSPORT_VAR_REC_MEDIUM_WR_STATUS,
+				  "WriteStatus");
 	if (rc)
 		goto out;
 
@@ -466,27 +494,29 @@ out:
 
 DBG_STATIC void transport_notify_lastchange(struct action_event *event, char *value)
 {
-	const char *varnames[] = {
+	const char *varnames[] =
+	{
 		"LastChange",
 		NULL
 	};
-	char *varvalues[] = {
+	char *varvalues[] =
+	{
 		NULL, NULL
 	};
 
 	DBG_PRINT(DBG_LVL4, "AVT Event: '%s'\n", value);
 	varvalues[0] = xmlescape(value, 0);
 
-    if (transport_values[TRANSPORT_VAR_LAST_CHANGE])
-        free(transport_values[TRANSPORT_VAR_LAST_CHANGE]);
+	if (transport_values[TRANSPORT_VAR_LAST_CHANGE])
+		free(transport_values[TRANSPORT_VAR_LAST_CHANGE]);
 
-    // Save arg
+	// Save arg
 	transport_values[TRANSPORT_VAR_LAST_CHANGE] = value;
 	UpnpNotify(device_handle, event->request->DevUDN,
-               event->request->ServiceID,
-               varnames, (const char **)varvalues, 1);
+		   event->request->ServiceID,
+		   varnames, (const char **)varvalues, 1);
 
-    free(varvalues[0]);
+	free(varvalues[0]);
 }
 
 void transport_set_var(int varnum, char *value)
@@ -498,31 +528,31 @@ void transport_set_var(int varnum, char *value)
 
 	if (transport_values[varnum])
 	{
-	    // Any change - return if identical
-	    if (strcmp(transport_values[varnum], value) == 0)
-            return;
-        // Free old value before saving new one
-        free(transport_values[varnum]);
+		// Any change - return if identical
+		if (strcmp(transport_values[varnum], value) == 0)
+			return;
+		// Free old value before saving new one
+		free(transport_values[varnum]);
 	}
 
 	transport_values[varnum] = strdup(value);
 
-    return;
+	return;
 }
 
 char *transport_get_var(int varnum)
 {
 	assert((varnum >= 0) && (varnum < TRANSPORT_VAR_UNKNOWN));
 
-    return transport_values[varnum];
+	return transport_values[varnum];
 }
 
 void transport_set_state(enum _transport_state state, char *value)
 {
-        transport_state = state;
-        transport_set_var(TRANSPORT_VAR_TRANSPORT_STATE, value);
+	transport_state = state;
+	transport_set_var(TRANSPORT_VAR_TRANSPORT_STATE, value);
 
-        return;
+	return;
 }
 
 /* warning - does not lock service mutex */
@@ -530,7 +560,7 @@ DBG_STATIC void transport_change_var(struct action_event *event, int varnum, cha
 {
 	char *buf;
 
-    transport_set_var(varnum, new_value);
+	transport_set_var(varnum, new_value);
 
 	asprintf(&buf,
 		 "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT/\">"
@@ -544,69 +574,71 @@ DBG_STATIC void transport_change_var(struct action_event *event, int varnum, cha
 
 DBG_STATIC char *transport_get_state_lastchange(void)
 {
-    char *buf;
+	char *buf;
 
-    // Construct LastChange event accordingly
-    if (strcmp(transport_values[TRANSPORT_VAR_CUR_TRACK_URI], "") == 0)
-    {
-        asprintf(&buf,
-             "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT/\">"
-             "<InstanceID val=\"0\">"
-                 "<%s val=\"%s\"/><%s val=\"%s\"/>"
-             "</InstanceID></Event>",
-             transport_variables[TRANSPORT_VAR_TRANSPORT_STATE], transport_values[TRANSPORT_VAR_TRANSPORT_STATE],
-             transport_variables[TRANSPORT_VAR_TRANSPORT_STATUS], transport_values[TRANSPORT_VAR_TRANSPORT_STATUS]);
-    } else {
-        asprintf(&buf,
-             "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT/\">"
-             "<InstanceID val=\"0\">"
-                 "<%s val=\"%s\"/><%s val=\"%s\"/><%s val=\"%s\"/><%s val=\"%s\"/><%s val=\"%s\"/>"
-             "</InstanceID></Event>",
-             transport_variables[TRANSPORT_VAR_TRANSPORT_STATE], transport_values[TRANSPORT_VAR_TRANSPORT_STATE],
-             transport_variables[TRANSPORT_VAR_TRANSPORT_STATUS], transport_values[TRANSPORT_VAR_TRANSPORT_STATUS],
-             transport_variables[TRANSPORT_VAR_CUR_TRACK_URI], transport_values[TRANSPORT_VAR_CUR_TRACK_URI],
-             transport_variables[TRANSPORT_VAR_CUR_TRACK_META], transport_values[TRANSPORT_VAR_CUR_TRACK_META],
-             transport_variables[TRANSPORT_VAR_CUR_TRACK_DUR], transport_values[TRANSPORT_VAR_CUR_TRACK_DUR]);
-    }
+	// Construct LastChange event accordingly
+	if (strcmp(transport_values[TRANSPORT_VAR_CUR_TRACK_URI], "") == 0)
+	{
+		asprintf(&buf,
+			 "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT/\">"
+			 "<InstanceID val=\"0\">"
+			 "<%s val=\"%s\"/><%s val=\"%s\"/>"
+			 "</InstanceID></Event>",
+			 transport_variables[TRANSPORT_VAR_TRANSPORT_STATE], transport_values[TRANSPORT_VAR_TRANSPORT_STATE],
+			 transport_variables[TRANSPORT_VAR_TRANSPORT_STATUS], transport_values[TRANSPORT_VAR_TRANSPORT_STATUS]);
+	}
+	else
+	{
+		asprintf(&buf,
+			 "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT/\">"
+			 "<InstanceID val=\"0\">"
+			 "<%s val=\"%s\"/><%s val=\"%s\"/><%s val=\"%s\"/><%s val=\"%s\"/><%s val=\"%s\"/>"
+			 "</InstanceID></Event>",
+			 transport_variables[TRANSPORT_VAR_TRANSPORT_STATE], transport_values[TRANSPORT_VAR_TRANSPORT_STATE],
+			 transport_variables[TRANSPORT_VAR_TRANSPORT_STATUS], transport_values[TRANSPORT_VAR_TRANSPORT_STATUS],
+			 transport_variables[TRANSPORT_VAR_CUR_TRACK_URI], transport_values[TRANSPORT_VAR_CUR_TRACK_URI],
+			 transport_variables[TRANSPORT_VAR_CUR_TRACK_META], transport_values[TRANSPORT_VAR_CUR_TRACK_META],
+			 transport_variables[TRANSPORT_VAR_CUR_TRACK_DUR], transport_values[TRANSPORT_VAR_CUR_TRACK_DUR]);
+	}
 
 
-    return buf;
+	return buf;
 }
 
 // Extract attribute from URI_METADATA
 const char *transport_get_attr_metadata(const char *key)
 {
-    IXML_Document *doc;
-    IXML_Element *elm;
-    const char *attr = NULL;
+	IXML_Document *doc;
+	IXML_Element *elm;
+	const char *attr = NULL;
 
-    const char *metadata = transport_get_var(TRANSPORT_VAR_AV_URI_META);
+	const char *metadata = transport_get_var(TRANSPORT_VAR_AV_URI_META);
 
-    if (!metadata || (strcmp(metadata, "") == 0))
-        return NULL;
+	if (!metadata || (strcmp(metadata, "") == 0))
+		return NULL;
 
-    doc = ixmlParseBuffer(metadata);
-    if (doc)
-    {
-        // Locate 'res' element
-        elm = ixmlDocument_getElementById(doc, "res");
-        if (elm != NULL)
-        {
-            // Look for 'key' attribute in 'res' element
-            attr = ixmlElement_getAttribute(elm, key);
-            // Copy of result (caller must free)
-            if (attr)
-                attr = strdup(attr);
-        }
+	doc = ixmlParseBuffer(metadata);
+	if (doc)
+	{
+		// Locate 'res' element
+		elm = ixmlDocument_getElementById(doc, "res");
+		if (elm != NULL)
+		{
+			// Look for 'key' attribute in 'res' element
+			attr = ixmlElement_getAttribute(elm, key);
+			// Copy of result (caller must free)
+			if (attr)
+				attr = strdup(attr);
+		}
 
-        // Free the whole DOM
-        ixmlDocument_free(doc);
-    }
+		// Free the whole DOM
+		ixmlDocument_free(doc);
+	}
 
-    DBG_PRINT(DBG_LVL1, "Track metadata: %s = %s\n", key, (attr) ? attr : "<not found>");
+	DBG_PRINT(DBG_LVL1, "Track metadata: %s = %s\n", key, (attr) ? attr : "<not found>");
 
-    // NULL if not found
-    return attr;
+	// NULL if not found
+	return attr;
 }
 
 /* UPnP action handlers */
@@ -618,7 +650,7 @@ DBG_STATIC int set_avtransport_uri(struct action_event *event)
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
@@ -630,7 +662,7 @@ DBG_STATIC int set_avtransport_uri(struct action_event *event)
 
 	DBG_PRINT(DBG_LVL4, "%s: Set URI to '%s'\n", __FUNCTION__, value);
 
-    // do the work
+	// do the work
 	output_set_uri(value);
 
 	transport_set_var(TRANSPORT_VAR_AV_URI, value);
@@ -638,7 +670,8 @@ DBG_STATIC int set_avtransport_uri(struct action_event *event)
 	free(value);
 
 	value = upnp_get_string(event, "CurrentURIMetaData");
-	if (value != NULL) {
+	if (value != NULL)
+	{
 		DBG_PRINT(DBG_LVL4, "%s: Set URI MetaData to '%s'\n", __FUNCTION__, value);
 
 		// First set new value so we may extract some information about
@@ -647,20 +680,22 @@ DBG_STATIC int set_avtransport_uri(struct action_event *event)
 		free(value);
 
 		// Locate duration attribute in 'res' element under 'item'
-        value = (char *)transport_get_attr_metadata("duration");
-        if (value)
-        {
-            transport_set_var(TRANSPORT_VAR_CUR_TRACK_DUR, value);
-            free(value);
-        }
-	} else {
+		value = (char *)transport_get_attr_metadata("duration");
+		if (value)
+		{
+			transport_set_var(TRANSPORT_VAR_CUR_TRACK_DUR, value);
+			free(value);
+		}
+	}
+	else
+	{
 		rc = -1;
 	}
 
-    transport_state = TRANSPORT_STOPPED;
-    transport_set_var(TRANSPORT_VAR_TRANSPORT_STATE, "STOPPED");
+	transport_state = TRANSPORT_STOPPED;
+	transport_set_var(TRANSPORT_VAR_TRANSPORT_STATE, "STOPPED");
 
-    transport_notify_lastchange(event, transport_get_state_lastchange());
+	transport_notify_lastchange(event, transport_get_state_lastchange());
 
 	ithread_mutex_unlock(&transport_mutex);
 
@@ -699,7 +734,7 @@ DBG_STATIC int get_transport_info(struct action_event *event)
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		//return -1;
 	}
 
@@ -721,19 +756,19 @@ out:
 
 DBG_STATIC int get_transport_settings(struct action_event *event)
 {
-    int rc = -1;
+	int rc = -1;
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
-    rc = upnp_append_variable(event, TRANSPORT_VAR_CUR_PLAY_MODE, "CurrentPlayMode");
+	rc = upnp_append_variable(event, TRANSPORT_VAR_CUR_PLAY_MODE, "CurrentPlayMode");
 	if (rc)
 		goto out;
 
-    rc = upnp_append_variable(event, TRANSPORT_VAR_CUR_REC_QUAL_MODE, "CurrentRecordQualityMode");
+	rc = upnp_append_variable(event, TRANSPORT_VAR_CUR_REC_QUAL_MODE, "CurrentRecordQualityMode");
 	if (rc)
 		goto out;
 
@@ -747,14 +782,14 @@ DBG_STATIC int get_position_info(struct action_event *event)
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
 	ithread_mutex_lock(&transport_mutex);
 
-    // Calls back into transport to set vars
-    output_update_position();
+	// Calls back into transport to set vars
+	output_update_position();
 
 	ithread_mutex_unlock(&transport_mutex);
 
@@ -800,64 +835,65 @@ DBG_STATIC int get_device_caps(struct action_event *event)
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
-        return -1;
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		return -1;
 	}
 
-    // *** TODO: Add some information
+	// *** TODO: Add some information
 
 	return rc;
 }
 
 DBG_STATIC int xplaymode(struct action_event *event)
 {
-    char *newmode;
-    int rc = 0;
+	char *newmode;
+	int rc = 0;
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
-    newmode = upnp_get_string(event, "NewPlayMode");
-    DBG_PRINT(DBG_LVL4, "Set NewPlayMode: %s\n", newmode);
+	newmode = upnp_get_string(event, "NewPlayMode");
+	DBG_PRINT(DBG_LVL4, "Set NewPlayMode: %s\n", newmode);
 
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) == STATUS_FAIL)
-        return -1;
+	// Check MPD connection
+	if (check_mpd_connection(TRUE) == STATUS_FAIL)
+		return -1;
 
 	ithread_mutex_lock(&transport_mutex);
 
-    rc = output_playmode(newmode);
-    if (rc != 0) {
-        free(newmode);
-        upnp_set_error(event, UPNP_TRANSPORT_E_PLAYMODE_NS, "Set playmode failed");
-        goto out;
-    }
+	rc = output_playmode(newmode);
+	if (rc != 0)
+	{
+		free(newmode);
+		upnp_set_error(event, UPNP_TRANSPORT_E_PLAYMODE_NS, "Set playmode failed");
+		goto out;
+	}
 
 	transport_change_var(event, TRANSPORT_VAR_CUR_PLAY_MODE, newmode);
-    free(newmode);
+	free(newmode);
 
 out:
 	ithread_mutex_unlock(&transport_mutex);
 
-    return rc;
+	return rc;
 }
 
 DBG_STATIC int xstop(struct action_event *event)
 {
-    int rc = 0;
+	int rc = 0;
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) == STATUS_FAIL)
-        return -1;
+	// Check MPD connection
+	if (check_mpd_connection(TRUE) == STATUS_FAIL)
+		return -1;
 
 	ithread_mutex_lock(&transport_mutex);
 
@@ -872,10 +908,12 @@ DBG_STATIC int xstop(struct action_event *event)
 		{
 			upnp_set_error(event, UPNP_TRANSPORT_E_NO_CONTENTS, "Player Stop failed");
 			rc = -1;
-		} else {
-            transport_state = TRANSPORT_STOPPED;
-            transport_change_var(event, TRANSPORT_VAR_TRANSPORT_STATE, "STOPPED");
-        }
+		}
+		else
+		{
+			transport_state = TRANSPORT_STOPPED;
+			transport_change_var(event, TRANSPORT_VAR_TRANSPORT_STATE, "STOPPED");
+		}
 		// Set TransportPlaySpeed to '1'
 		break;
 
@@ -893,17 +931,17 @@ DBG_STATIC int xstop(struct action_event *event)
 
 DBG_STATIC int xpause(struct action_event *event)
 {
-    int rc = 0;
+	int rc = 0;
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) == STATUS_FAIL)
-        return -1;
+	// Check MPD connection
+	if (check_mpd_connection(TRUE) == STATUS_FAIL)
+		return -1;
 
 	ithread_mutex_lock(&transport_mutex);
 
@@ -916,10 +954,12 @@ DBG_STATIC int xpause(struct action_event *event)
 		{
 			upnp_set_error(event, UPNP_TRANSPORT_E_NO_CONTENTS, "Player Pause failed");
 			rc = -1;
-		} else {
-            transport_state = TRANSPORT_PAUSED_PLAYBACK;
-            transport_change_var(event, TRANSPORT_VAR_TRANSPORT_STATE, "PAUSED_PLAYBACK");
-        }
+		}
+		else
+		{
+			transport_state = TRANSPORT_PAUSED_PLAYBACK;
+			transport_change_var(event, TRANSPORT_VAR_TRANSPORT_STATE, "PAUSED_PLAYBACK");
+		}
 		break;
 
 	case TRANSPORT_PAUSED_PLAYBACK:
@@ -927,11 +967,13 @@ DBG_STATIC int xpause(struct action_event *event)
 		{
 			upnp_set_error(event, UPNP_TRANSPORT_E_NO_CONTENTS, "Player Start failed");
 			rc = -1;
-		} else {
+		}
+		else
+		{
 			transport_state = TRANSPORT_PLAYING;
 			transport_change_var(event, TRANSPORT_VAR_TRANSPORT_STATE, "PLAYING");
 		}
-       break;
+		break;
 
 	case TRANSPORT_TRANSITIONING:
 	case TRANSPORT_NO_MEDIA_PRESENT:
@@ -951,27 +993,31 @@ DBG_STATIC int xplay(struct action_event *event)
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) == STATUS_FAIL)
-        return -1;
+	// Check MPD connection
+	if (check_mpd_connection(TRUE) == STATUS_FAIL)
+		return -1;
 
 	ithread_mutex_lock(&transport_mutex);
 
-	switch (transport_state) {
+	switch (transport_state)
+	{
 	case TRANSPORT_PLAYING:
 		// Set TransportPlaySpeed to '1'
 		break;
 
 	case TRANSPORT_STOPPED:
 	case TRANSPORT_PAUSED_PLAYBACK:
-		if (output_play()) {
+		if (output_play())
+		{
 			upnp_set_error(event, UPNP_TRANSPORT_E_NO_CONTENTS, "Player Start failed");
 			rc = -1;
-		} else {
+		}
+		else
+		{
 			transport_state = TRANSPORT_PLAYING;
 			transport_change_var(event, TRANSPORT_VAR_TRANSPORT_STATE, "PLAYING");
 
@@ -983,7 +1029,7 @@ DBG_STATIC int xplay(struct action_event *event)
 	case TRANSPORT_TRANSITIONING:
 		/* action not allowed in these states - error 701 */
 		upnp_set_error(event, UPNP_TRANSPORT_E_TRANSITION_NA,
-                       "Transition not allowed");
+			       "Transition not allowed");
 		rc = -1;
 
 		break;
@@ -996,38 +1042,40 @@ DBG_STATIC int xplay(struct action_event *event)
 
 DBG_STATIC int xseek(struct action_event *event)
 {
-    char *value, *mode;
+	char *value, *mode;
 	int rc = 0;
 
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
 
-    mode = upnp_get_string(event, "Unit");
-    if (mode == NULL)
-        return -1;
+	mode = upnp_get_string(event, "Unit");
+	if (mode == NULL)
+		return -1;
 
 	value = upnp_get_string(event, "Target");
 	if (value == NULL)
 	{
-	    free(mode);
+		free(mode);
 		return -1;
 	}
 
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) == STATUS_FAIL)
-        return -1;
+	// Check MPD connection
+	if (check_mpd_connection(TRUE) == STATUS_FAIL)
+		return -1;
 
-    // Attempt to seek player (doesn't work for streams)
-    rc = output_seekto(mode, value);
-    free(mode); free(value);
-    if (rc != 0) {
-        upnp_set_error(event, UPNP_TRANSPORT_E_ILL_SEEKTARGET, "Player Seek failed");
-        return -1;
-    }
+	// Attempt to seek player (doesn't work for streams)
+	rc = output_seekto(mode, value);
+	free(mode);
+	free(value);
+	if (rc != 0)
+	{
+		upnp_set_error(event, UPNP_TRANSPORT_E_ILL_SEEKTARGET, "Player Seek failed");
+		return -1;
+	}
 
 	return rc;
 }
@@ -1036,18 +1084,19 @@ DBG_STATIC int xnext(struct action_event *event)
 {
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) == STATUS_FAIL)
-        return -1;
+	// Check MPD connection
+	if (check_mpd_connection(TRUE) == STATUS_FAIL)
+		return -1;
 
-    if (output_next()) {
-        upnp_set_error(event, UPNP_TRANSPORT_E_TRANSITION_NA, "Player Next failed");
-        return -1;
-    }
+	if (output_next())
+	{
+		upnp_set_error(event, UPNP_TRANSPORT_E_TRANSITION_NA, "Player Next failed");
+		return -1;
+	}
 
 	return 0;
 }
@@ -1056,36 +1105,38 @@ DBG_STATIC int xprevious(struct action_event *event)
 {
 	if (upnp_obtain_instanceid(event, NULL))
 	{
-	    upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
+		upnp_set_error(event, UPNP_TRANSPORT_E_INVALID_IID, "ID non-zero invalid");
 		return -1;
 	}
 
-    // Check MPD connection
-    if (check_mpd_connection(TRUE) == STATUS_FAIL)
-        return -1;
+	// Check MPD connection
+	if (check_mpd_connection(TRUE) == STATUS_FAIL)
+		return -1;
 
-    if (output_prev()) {
-        upnp_set_error(event, UPNP_TRANSPORT_E_TRANSITION_NA, "Player Previous failed");
-        return -1;
-    }
+	if (output_prev())
+	{
+		upnp_set_error(event, UPNP_TRANSPORT_E_TRANSITION_NA, "Player Previous failed");
+		return -1;
+	}
 
 	return 0;
 }
 
 DBG_STATIC int transport_notify_subscription(void)
 {
-   	ithread_mutex_lock(&transport_mutex);
+	ithread_mutex_lock(&transport_mutex);
 
-    output_update_status();
+	output_update_status();
 
 	transport_set_var(TRANSPORT_VAR_LAST_CHANGE, transport_get_state_lastchange());
 
 	ithread_mutex_unlock(&transport_mutex);
 
-    return 0;
+	return 0;
 }
 
-static struct action transport_actions[] = {
+static struct action transport_actions[] =
+{
 	[TRANSPORT_CMD_GETCURRENTTRANSPORTACTIONS] = {"GetCurrentTransportActions", NULL},	/* optional */
 	[TRANSPORT_CMD_GETDEVICECAPABILITIES] =     {"GetDeviceCapabilities", get_device_caps},
 	[TRANSPORT_CMD_GETMEDIAINFO] =              {"GetMediaInfo", get_media_info},
@@ -1107,35 +1158,36 @@ static struct action transport_actions[] = {
 };
 
 
-struct service transport_service = {
-        .service_name =         TRANSPORT_SERVICE,
-        .type =                 TRANSPORT_TYPE,
-        .scpd_url =		        TRANSPORT_SCPD_URL,
-        .control_url =		    TRANSPORT_CONTROL_URL,
-        .event_url =		    TRANSPORT_EVENT_URL,
-        .actions =              transport_actions,
-        .action_arguments =     argument_list,
-        .variable_names =       transport_variables,
-        .variable_values =      transport_values,
-        .variable_defaults =    transport_defaults,
-        .variable_meta =        transport_var_meta,
-        .variable_count =       TRANSPORT_VAR_UNKNOWN,
-        .command_count =        TRANSPORT_CMD_UNKNOWN,
-        .service_mutex =        &transport_mutex,
-        .subscription_notify =  &transport_notify_subscription
+struct service transport_service =
+{
+	.service_name =         TRANSPORT_SERVICE,
+	.type =                 TRANSPORT_TYPE,
+	.scpd_url =		        TRANSPORT_SCPD_URL,
+	.control_url =		    TRANSPORT_CONTROL_URL,
+	.event_url =		    TRANSPORT_EVENT_URL,
+	.actions =              transport_actions,
+	.action_arguments =     argument_list,
+	.variable_names =       transport_variables,
+	.variable_values =      transport_values,
+	.variable_defaults =    transport_defaults,
+	.variable_meta =        transport_var_meta,
+	.variable_count =       TRANSPORT_VAR_UNKNOWN,
+	.command_count =        TRANSPORT_CMD_UNKNOWN,
+	.service_mutex =        &transport_mutex,
+	.subscription_notify =  &transport_notify_subscription
 };
 
 void transport_init(void)
 {
-    // init values array
-    memset(transport_values, 0, sizeof(transport_values));
+	// init values array
+	memset(transport_values, 0, sizeof(transport_values));
 
-    // Some things that we will need early
+	// Some things that we will need early
 	transport_values[TRANSPORT_VAR_TRANSPORT_STATE] = strdup(transport_defaults[TRANSPORT_VAR_TRANSPORT_STATE]);
 	transport_values[TRANSPORT_VAR_TRANSPORT_STATUS] = strdup(transport_defaults[TRANSPORT_VAR_TRANSPORT_STATUS]);
-    transport_values[TRANSPORT_VAR_CUR_TRACK_URI] = strdup(transport_defaults[TRANSPORT_VAR_CUR_TRACK_URI]);
-    transport_values[TRANSPORT_VAR_CUR_TRACK_META] = strdup(transport_defaults[TRANSPORT_VAR_CUR_TRACK_META]);
-    transport_values[TRANSPORT_VAR_CUR_TRACK_DUR] = strdup(transport_defaults[TRANSPORT_VAR_CUR_TRACK_DUR]);
+	transport_values[TRANSPORT_VAR_CUR_TRACK_URI] = strdup(transport_defaults[TRANSPORT_VAR_CUR_TRACK_URI]);
+	transport_values[TRANSPORT_VAR_CUR_TRACK_META] = strdup(transport_defaults[TRANSPORT_VAR_CUR_TRACK_META]);
+	transport_values[TRANSPORT_VAR_CUR_TRACK_DUR] = strdup(transport_defaults[TRANSPORT_VAR_CUR_TRACK_DUR]);
 
-    return;
+	return;
 }

@@ -33,7 +33,7 @@ upnp_add_response(struct action_event *event, char *key, const char *value);
 
 
 extern void upnp_set_error(struct action_event *event, int error_code,
-                            const char *format, ...);
+			   const char *format, ...);
 extern char *upnp_get_string(struct action_event *event, const char *key);
 extern int upnp_append_variable(struct action_event *event, int varnum, char *paramname);
 extern int upnp_obtain_instanceid(struct action_event *event, int *instance);
